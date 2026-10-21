@@ -165,7 +165,7 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 .gallery-loading-track>div{height:100%;width:36%;background:linear-gradient(90deg,#bd5073,#f0c99d);border-radius:20px;animation:gallery-loading 1.2s ease-in-out infinite alternate}
 @keyframes gallery-loading{from{transform:translateX(-100%)}to{transform:translateX(285%)}}
 /* v1.5.0 — visualizador e progresso de envio */
-.media-open{background:radial-gradient(circle at center,#694056,#39212e 70%)!important;display:block;width:100%;padding:0;border:0;background:transparent;text-align:left;cursor:zoom-in}
+.media-open{position:relative;background:radial-gradient(circle at center,#694056,#39212e 70%)!important;display:block;width:100%;padding:0;border:0;background:transparent;text-align:left;cursor:zoom-in}
 .media-open img,.media-open video{width:100%;display:block;aspect-ratio:4/3;object-fit:cover;pointer-events:none}
 .media-actions{display:flex;gap:8px;padding:10px}
 .media-actions button{flex:1;min-height:39px;border:1px solid #eac39b;border-radius:24px;background:#efc99d;color:#351623;font-size:12px;font-weight:700}
@@ -203,7 +203,7 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 .ranking-card{position:relative;background:#38202d;border:1px solid #d7ad82;border-radius:17px;overflow:hidden;box-shadow:0 12px 35px #0005}
 .ranking-card:first-child{border:2px solid #f0c99d;box-shadow:0 12px 38px #f0c99d24}
 .ranking-card img,.ranking-card video{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
-.ranking-card button{display:block;width:100%;border:0;background:transparent;color:inherit;padding:0}
+.ranking-card button{position:relative;display:block;width:100%;border:0;background:transparent;color:inherit;padding:0}
 .ranking-detail{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;color:#f9e6d5}
 .ranking-position{font:500 18px "Playfair Display",serif;color:#f0c99d}
 .ranking-likes{font-weight:700;color:#ffc4d0}
@@ -227,6 +227,7 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 .guest-box button{display:block;width:100%;margin-top:12px;min-height:49px;border:1px solid #f0c99d;border-radius:30px;background:#efc99d;color:#341521;font-weight:700}
 #guest-skip{background:transparent;color:#ffe6d0}.guest-box h3{color:#ffe6d0;font:400 25px Georgia,serif}.welcome-ornament{color:#efc99d;font-size:24px;letter-spacing:8px}.welcome-note{font-size:11px;color:#e9c3cd}#guest-video{background:#f2d4ad}#guest-camera{background:#8b4860;color:#fff4eb}
 #guest-error{color:#ffd5d5;font-size:12px;margin-top:10px}
+.ranking-card button[data-preview]:after,.media-open[data-preview]:after{content:attr(data-preview);position:absolute;top:50%;left:0;width:100%;transform:translateY(-50%);text-align:center;color:#f3d5bd;font-size:13px;pointer-events:none}
 </style>
 </head>
 <body><div id="guest-welcome" class="guest-welcome" hidden><div class="guest-box"><h2>Bem-vindo à festa da Anne!</h2><p>Como podemos chamar você?</p><form id="guest-form"><input id="guest-name" placeholder="Seu primeiro nome" maxlength="50" required><button type="submit">Entrar na festa</button></form><div id="guest-selfie" hidden><div class="welcome-ornament">✦ ♡ ✦</div><h3 id="guest-invitation-title">Você faz parte dessa história!</h3><p>Que alegria ter você aqui! Antes de aproveitar a festa, que tal deixar uma lembrança especial para a Anne?</p><p>Deixe um recadinho em vídeo para ela guardar suas palavras com carinho, ou tire uma selfie para ela lembrar do seu sorriso nessa noite tão especial.</p><p class="welcome-note">As imagens enviadas aparecerão na galeria e poderão ser vistas e baixadas pelos convidados.</p><button type="button" id="guest-video">♡ Deixar um recadinho em vídeo</button><button type="button" id="guest-camera">✧ Tirar uma selfie para a Anne</button><button type="button" id="guest-skip">Agora não, quero entrar</button></div><div id="guest-error" role="status"></div></div></div>
