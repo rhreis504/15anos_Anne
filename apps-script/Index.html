@@ -302,7 +302,7 @@ function renderRanking(){
  top.forEach((item,index)=>{
   const card=document.createElement('article');card.className='ranking-card';
   const button=document.createElement('button');button.type='button';button.setAttribute('aria-label','Visualizar momento do ranking');button.onclick=()=>openViewer(item);
-  const img=document.createElement('img');img.loading='lazy';img.alt='Momento na posição '+(index+1);img.src=item.thumb;button.append(img);
+  const img=document.createElement('img');img.loading='lazy';img.alt='Momento na posição '+(index+1);img.src=item.thumb;img.onerror=()=>loadPreview(item,img);button.append(img);
   const info=document.createElement('div');info.className='ranking-detail';
   const pos=document.createElement('span');pos.className='ranking-position';pos.textContent=(index+1)+'º lugar';
   const count=document.createElement('span');count.className='ranking-likes';count.textContent='♥ '+(item.likes||0);
