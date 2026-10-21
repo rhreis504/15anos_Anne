@@ -300,8 +300,9 @@ let activeObjectUrl=null,selectedMedia=null,mediaLoading=false;
 const mediaRequests=new Map();
 function mediaRpc(id){if(mediaRequests.has(id))return mediaRequests.get(id);const request=new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getMediaData(id));mediaRequests.set(id,request);request.then(()=>{},()=>mediaRequests.delete(id));return request}
 function mediaBlob(data){const binary=atob(data.base64);const bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return new Blob([bytes],{type:data.mime})}
-function closeViewer(){el('viewer').classList.remove('open');el('viewer-body').replaceChildren();if(activeObjectUrl){if(!selectedMedia||previewCache.get(selectedMedia.id)!==activeObjectUrl)URL.revokeObjectURL(activeObjectUrl);activeObjectUrl=null}selectedMedia=null;el('viewer-download').disabled=true;document.body.style.overflow=''}
-async function openViewer(item){closeViewer();selectedMedia=item;el('viewer-title').textContent=item.name||'Momento da Anne';el('viewer').classList.add('open');document.body.style.overflow='hidden';el('viewer-body').textContent='Carregando momento…';el('viewer-download').disabled=true;if(!item.type.startsWith('video/')){const quick=document.createElement('img');quick.src=previewCache.get(item.id)||item.thumb;quick.alt='Foto da festa';quick.style.cssText='max-width:100%;max-height:70vh;object-fit:contain';el('viewer-body').replaceChildren(quick)}if(item.type.startsWith('video/')){showVideo(item);return}try{const cached=previewCache.get(item.id);const data=cached?{mime:item.type}:await mediaRpc(item.id);if(selectedMedia!==item)return;activeObjectUrl=cached||URL.createObjectURL(mediaBlob(data));el('viewer-body').replaceChildren();const media=document.createElement(data.mime.startsWith('video/')?'video':'img');media.src=activeObjectUrl;if(media.tagName==='VIDEO'){media.controls=true;media.playsInline=true;media.preload='metadata'}else media.alt='Fotografia da festa';el('viewer-body').append(media);el('viewer-download').disabled=false}catch(e){if(selectedMedia===item)el('viewer-body').textContent='Não foi possível abrir o arquivo: '+(e.message||e)}}
+let readyShareFile=null;
+function closeViewer(){readyShareFile=null;el('viewer').classList.remove('open');el('viewer-body').replaceChildren();if(activeObjectUrl){if(!selectedMedia||previewCache.get(selectedMedia.id)!==activeObjectUrl)URL.revokeObjectURL(activeObjectUrl);activeObjectUrl=null}selectedMedia=null;el('viewer-download').disabled=true;document.body.style.overflow=''}
+async function openViewer(item){closeViewer();selectedMedia=item;el('viewer-title').textContent=item.name||'Momento da Anne';el('viewer').classList.add('open');document.body.style.overflow='hidden';el('viewer-body').textContent='Carregando momento…';el('viewer-download').disabled=true;if(!item.type.startsWith('video/')){const quick=document.createElement('img');quick.src=previewCache.get(item.id)||item.thumb;quick.alt='Foto da festa';quick.style.cssText='max-width:100%;max-height:70vh;object-fit:contain';el('viewer-body').replaceChildren(quick)}if(item.type.startsWith('video/')){showVideo(item);return}try{const cached=previewCache.get(item.id);const data=cached?{mime:item.type}:await mediaRpc(item.id);if(selectedMedia!==item)return;activeObjectUrl=cached||URL.createObjectURL(mediaBlob(data));try{const blob=cached?await (await fetch(cached)).blob():mediaBlob(data);if(selectedMedia!==item)return;readyShareFile=new File([blob],item.name||'foto-anne.jpg',{type:blob.type||item.type});}catch(e){readyShareFile=null}el('viewer-body').replaceChildren();const media=document.createElement(data.mime.startsWith('video/')?'video':'img');media.src=activeObjectUrl;if(media.tagName==='VIDEO'){media.controls=true;media.playsInline=true;media.preload='metadata'}else media.alt='Fotografia da festa';el('viewer-body').append(media);el('viewer-download').textContent='↗ Salvar foto';el('viewer-download').disabled=false}catch(e){if(selectedMedia===item)el('viewer-body').textContent='Não foi possível abrir o arquivo: '+(e.message||e)}}
 function showVideo(item){
  const frame=document.createElement('iframe');
  frame.src=item.view;
@@ -310,9 +311,23 @@ function showVideo(item){
  frame.allowFullscreen=true;
  frame.style.cssText='width:100%;height:60vh;border:0';
  const link=document.createElement('a');link.href=item.view;link.target='_blank';link.rel='noopener noreferrer';link.textContent='Se o vídeo não abrir, assistir no Google Drive ↗';link.style.cssText='display:block;text-align:center;color:#f0c99d;padding:12px';el('viewer-body').replaceChildren(frame,link);
- el('viewer-download').disabled=false;
+ el('viewer-download').textContent='↓ Baixar vídeo';el('viewer-download').disabled=false;
 }
-function downloadCurrent(){if(!selectedMedia)return;if(selectedMedia.type.startsWith('video/')){window.open(selectedMedia.download,'_blank','noopener');return}if(!activeObjectUrl)return;const a=document.createElement('a');a.href=activeObjectUrl;a.download=selectedMedia.name||'momento-anne';document.body.append(a);a.click();a.remove()}
+function downloadCurrent(){
+ if(!selectedMedia)return;
+ if(selectedMedia.type.startsWith('video/')){window.open(selectedMedia.download,'_blank','noopener');return}
+ if(!activeObjectUrl)return;
+ if(readyShareFile&&navigator.share&&(!navigator.canShare||navigator.canShare({files:[readyShareFile]}))){
+  navigator.share({files:[readyShareFile],title:'Foto da festa da Anne'}).catch(err=>{if(err&&err.name!=='AbortError')fallbackSavePhoto()});return;
+ }
+ fallbackSavePhoto();
+}
+function fallbackSavePhoto(){
+ if(!activeObjectUrl)return;
+ const isiPhone=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+ if(isiPhone){const tab=window.open(activeObjectUrl,'_blank');if(tab)return;}
+ const a=document.createElement('a');a.href=activeObjectUrl;a.download=selectedMedia.name||'foto-anne.jpg';document.body.append(a);a.click();a.remove();
+}
 el('viewer-close').onclick=closeViewer;el('viewer-download').onclick=downloadCurrent;el('viewer').onclick=e=>{if(e.target===el('viewer'))closeViewer()};document.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewer()});
 const previewQueue=[];
 let previewBusy=0;
