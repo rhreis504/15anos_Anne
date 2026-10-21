@@ -295,6 +295,15 @@ function closeViewer(){el('viewer').classList.remove('open');el('viewer-body').r
 async function openViewer(item){closeViewer();selectedMedia=item;el('viewer-title').textContent=item.name||'Momento da Anne';el('viewer').classList.add('open');document.body.style.overflow='hidden';el('viewer-body').textContent='Carregando momento…';el('viewer-download').disabled=true;try{const data=await mediaRpc(item.id);if(selectedMedia!==item)return;const blob=mediaBlob(data);activeObjectUrl=URL.createObjectURL(blob);el('viewer-body').replaceChildren();const media=document.createElement(data.mime.startsWith('video/')?'video':'img');media.src=activeObjectUrl;if(media.tagName==='VIDEO'){media.controls=true;media.playsInline=true;media.preload='metadata'}else media.alt='Fotografia da festa';el('viewer-body').append(media);el('viewer-download').disabled=false}catch(e){if(selectedMedia===item)el('viewer-body').textContent='Não foi possível abrir o arquivo: '+(e.message||e)}}
 function downloadCurrent(){if(!selectedMedia||!activeObjectUrl)return;const a=document.createElement('a');a.href=activeObjectUrl;a.download=selectedMedia.name||'momento-anne';document.body.append(a);a.click();a.remove()}
 el('viewer-close').onclick=closeViewer;el('viewer-download').onclick=downloadCurrent;el('viewer').onclick=e=>{if(e.target===el('viewer'))closeViewer()};document.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewer()});
+const previewCache=new Map();
+function loadPreview(item,img){
+ img.onerror=null;
+ mediaRpc(item.id).then(data=>{
+  const url=URL.createObjectURL(mediaBlob(data));
+  previewCache.set(item.id,url);
+  if(img.isConnected)img.src=url;
+ }).catch(()=>{img.alt='Toque para visualizar';img.removeAttribute('src')});
+}
 function renderRanking(){
  const root=el('ranking-grid');root.replaceChildren();
  const top=[...galleryItems].filter(i=>Number(i.likes)>0).sort((a,b)=>Number(b.likes)-Number(a.likes)||b.created-a.created).slice(0,10);
