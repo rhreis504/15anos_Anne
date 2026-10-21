@@ -266,6 +266,24 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 <div id="viewer" class="viewer" role="dialog" aria-modal="true" aria-label="Visualizador de momentos"><div class="viewer-panel"><div class="viewer-head"><strong id="viewer-title">Momento especial</strong><button type="button" id="viewer-close" class="viewer-close" aria-label="Fechar visualizador">×</button></div><div id="viewer-body" class="viewer-body"></div><button type="button" id="viewer-download" class="viewer-download" disabled>↓ Baixar arquivo</button></div></div>
 <script>
 const el=id=>document.getElementById(id);let galleryItems=[],activeFilter='all';const favorites=new Set();const likedIds=new Set();try{JSON.parse(localStorage.getItem('anne_public_likes')||'[]').forEach(id=>likedIds.add(id))}catch(e){}function status(s){el('status').textContent=s}
+
+let guestProfile=null;
+try{guestProfile=JSON.parse(localStorage.getItem('anne_guest_v1')||'null')}catch(e){}
+function finishWelcome(){el('guest-welcome').hidden=true;document.body.style.overflow=''}
+if(!guestProfile||!guestProfile.name){el('guest-welcome').hidden=false;document.body.style.overflow='hidden'}
+el('guest-form').onsubmit=e=>{
+ e.preventDefault();
+ const name=el('guest-name').value.trim();
+ if(name.length<2){el('guest-error').textContent='Informe seu nome.';return}
+ const id='guest_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+ google.script.run.withSuccessHandler(result=>{
+  guestProfile={name:result.name,id:id};
+  try{localStorage.setItem('anne_guest_v1',JSON.stringify(guestProfile))}catch(e){}
+  el('guest-form').hidden=true;el('guest-selfie').hidden=false;
+ }).withFailureHandler(err=>{el('guest-error').textContent=err.message||String(err)}).registerGuest(name,id);
+};
+el('guest-skip').onclick=finishWelcome;
+el('guest-camera').onclick=()=>{finishWelcome();el('camera').click()};
 let activeObjectUrl=null,selectedMedia=null,mediaLoading=false;
 function mediaRpc(id){return new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getMediaData(id))}
 function mediaBlob(data){const binary=atob(data.base64);const bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return new Blob([bytes],{type:data.mime})}
