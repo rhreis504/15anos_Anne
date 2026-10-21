@@ -67,7 +67,7 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 
 /* Modelo 1 — composição editorial inspirada na referência escolhida */
-:root{--cover:url("https://raw.githubusercontent.com/rhreis504/15anos_Anne/main/anne-debutante.jpg")}
+:root{--cover:url("https://raw.githubusercontent.com/rhreis504/15anos_Anne/main/anne-desktop.jpg")}
 .topbar{position:relative;z-index:2;background:#2a1019e8;border-bottom-color:#eec7a455}
 .hero{min-height:640px;justify-content:flex-end;text-align:left;padding:64px clamp(24px,6vw,100px);background:linear-gradient(90deg,#260e160a 0%,#310e1e40 35%,#270d1ae8 75%,#210e18f2 100%),var(--cover) left 35% center/cover no-repeat,radial-gradient(circle at 25% 35%,#a75b70,#2b1019 65%)}
 .hero:before{inset:clamp(9px,2vw,20px);border-radius:18px;z-index:0}
@@ -107,7 +107,7 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 }
 @media(max-width:360px){.hero{min-height:625px}.hero-inner{padding:12px 5px}.scriptname{font-size:82px}.overline{letter-spacing:.15em}.gallery-tools button{padding:7px 10px}}
 
-/* v1.3.2 — retrato íntegro e texto separado no celular */
+/* v1.4.0 — capas separadas desktop e mobile */
 @media(min-width:901px){
 .hero{background:linear-gradient(90deg,#24101b0a 0%,#24101b20 34%,#270d1bd9 62%,#210e18f5 100%),var(--cover) left center/auto 100% no-repeat,linear-gradient(110deg,#704251,#2a111d);min-height:610px}
 .hero-inner{position:relative;z-index:1}
@@ -117,6 +117,7 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 .hero-inner{position:relative;z-index:1}
 }
 @media(max-width:620px){
+:root{--cover:url("https://raw.githubusercontent.com/rhreis504/15anos_Anne/main/anne-mobile.jpg")}
 .hero{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-end;min-height:0;padding:0 0 18px;background:#29121e}
 .hero:before{inset:8px;border-radius:12px;z-index:3}
 .hero-photo{height:clamp(300px,93vw,430px);width:100%;background:linear-gradient(180deg,#210e1711 0%,#210e1711 67%,#29121e 100%),var(--cover) center 34%/auto 100% no-repeat,linear-gradient(135deg,#8e4a5f,#301725)}
