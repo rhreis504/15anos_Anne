@@ -265,6 +265,8 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 </main>
 <footer><strong>Anne</strong>Uma noite para sempre · 15 anos</footer>
 <div id="viewer" class="viewer" role="dialog" aria-modal="true" aria-label="Visualizador de momentos"><div class="viewer-panel"><div class="viewer-head"><strong id="viewer-title">Momento especial</strong><button type="button" id="viewer-close" class="viewer-close" aria-label="Fechar visualizador">×</button></div><div id="viewer-body" class="viewer-body"></div><button type="button" id="viewer-download" class="viewer-download" disabled>↓ Baixar arquivo</button></div></div>
+<script src="./config.js"></script>
+<script src="./bridge.js"></script>
 <script>
 const el=id=>document.getElementById(id);let galleryItems=[],activeFilter='all';const favorites=new Set();const likedIds=new Set();try{JSON.parse(localStorage.getItem('anne_public_likes')||'[]').forEach(id=>likedIds.add(id))}catch(e){}function status(s){el('status').textContent=s}
 
