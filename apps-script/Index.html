@@ -220,12 +220,12 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 @media(max-width:620px){.ranking-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.ranking-card:first-child{grid-column:auto}.ranking-card:first-child img{aspect-ratio:1}}
 .guest-welcome{transition:opacity .65s ease;position:fixed;inset:0;z-index:11000;display:flex;align-items:center;justify-content:center;padding:18px;background:#180a13f5;overflow:auto}
 .guest-welcome[hidden],#guest-selfie[hidden]{display:none}.guest-welcome.guest-leaving{opacity:0;pointer-events:none}
-.guest-box{width:min(100%,430px);padding:36px 25px;border:1px solid #edc99a;border-radius:22px;background:radial-gradient(circle at top,#633043,#2b1420 75%);text-align:center;box-shadow:0 22px 65px #0009}
-.guest-box h2{font:400 32px "Playfair Display",serif;color:#ffe0bd}
+.guest-box{animation:guestReveal .75s ease-out both;max-height:94dvh;overflow-y:auto;width:min(100%,430px);padding:36px 25px;border:1px solid #edc99a;border-radius:22px;background:radial-gradient(circle at top,#633043,#2b1420 75%);text-align:center;box-shadow:0 22px 65px #0009}
+@keyframes guestReveal{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}.guest-box h2{font:400 32px "Playfair Display",serif;color:#ffe0bd}
 .guest-box p{color:#f6d9d5}
 .guest-box input{width:100%;padding:15px;border:1px solid #f0c99d;border-radius:12px;background:#fff9f2;color:#311421;font:inherit;margin:12px 0}
 .guest-box button{display:block;width:100%;margin-top:12px;min-height:49px;border:1px solid #f0c99d;border-radius:30px;background:#efc99d;color:#341521;font-weight:700}
-#guest-skip{background:transparent;color:#ffe6d0}
+#guest-skip{background:transparent;color:#ffe6d0}.guest-box h3{color:#ffe6d0;font:400 25px Georgia,serif}.welcome-ornament{color:#efc99d;font-size:24px;letter-spacing:8px}.welcome-note{font-size:11px;color:#e9c3cd}#guest-video{background:#f2d4ad}#guest-camera{background:#8b4860;color:#fff4eb}
 #guest-error{color:#ffd5d5;font-size:12px;margin-top:10px}
 </style>
 </head>
