@@ -275,7 +275,7 @@ el('guest-form').onsubmit=e=>{
  e.preventDefault();
  const name=el('guest-name').value.trim();
  if(name.length<2){el('guest-error').textContent='Informe seu nome.';return}
- const id='guest_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+ const random=new Uint8Array(20);crypto.getRandomValues(random);const id='guest_'+Array.from(random,b=>b.toString(16).padStart(2,'0')).join('');
  google.script.run.withSuccessHandler(result=>{
   guestProfile={name:result.name,id:id};
   try{localStorage.setItem('anne_guest_v1',JSON.stringify(guestProfile))}catch(e){}
@@ -283,7 +283,7 @@ el('guest-form').onsubmit=e=>{
  }).withFailureHandler(err=>{el('guest-error').textContent=err.message||String(err)}).registerGuest(name,id);
 };
 el('guest-skip').onclick=finishWelcome;
-if(guestProfile&&guestProfile.id){google.script.run.withSuccessHandler(ids=>{likedIds.clear();ids.forEach(id=>likedIds.add(id));renderGallery()}).getGuestVotes(guestProfile.id)}
+if(guestProfile&&guestProfile.id){google.script.run.withSuccessHandler(ids=>{likedIds.clear();ids.forEach(id=>likedIds.add(id));renderGallery()}).withFailureHandler(e=>status('Não foi possível sincronizar curtidas: '+(e.message||e))).getGuestVotes(guestProfile.id)}
 el('guest-camera').onclick=()=>{finishWelcome();el('camera').click()};
 let activeObjectUrl=null,selectedMedia=null,mediaLoading=false;
 function mediaRpc(id){return new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getMediaData(id))}
