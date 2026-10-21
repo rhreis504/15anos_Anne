@@ -218,8 +218,8 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 .ranking-card img{aspect-ratio:1}
 @media(max-width:900px){.ranking-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:620px){.ranking-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.ranking-card:first-child{grid-column:auto}.ranking-card:first-child img{aspect-ratio:1}}
-.guest-welcome{position:fixed;inset:0;z-index:11000;display:flex;align-items:center;justify-content:center;padding:18px;background:#180a13f5;overflow:auto}
-.guest-welcome[hidden],#guest-selfie[hidden]{display:none}
+.guest-welcome{transition:opacity .65s ease;position:fixed;inset:0;z-index:11000;display:flex;align-items:center;justify-content:center;padding:18px;background:#180a13f5;overflow:auto}
+.guest-welcome[hidden],#guest-selfie[hidden]{display:none}.guest-welcome.guest-leaving{opacity:0;pointer-events:none}
 .guest-box{width:min(100%,430px);padding:36px 25px;border:1px solid #edc99a;border-radius:22px;background:radial-gradient(circle at top,#633043,#2b1420 75%);text-align:center;box-shadow:0 22px 65px #0009}
 .guest-box h2{font:400 32px "Playfair Display",serif;color:#ffe0bd}
 .guest-box p{color:#f6d9d5}
