@@ -307,7 +307,7 @@ function loadPreview(item,img){
   if(!img.isConnected)return;
   if(data.mime.startsWith('video/')){
    const video=document.createElement('video');video.src=url;video.muted=true;video.playsInline=true;video.preload='auto';video.addEventListener('loadedmetadata',()=>{if(Number.isFinite(video.duration)&&video.duration>.1)video.currentTime=Math.min(.25,video.duration/2)},{once:true});video.setAttribute('aria-label','Prévia do vídeo');img.replaceWith(video);
-  }else img.src=url;
+  }else{img.style.visibility='visible';img.src=url}
  }).catch(()=>{img.alt='Toque para visualizar';img.removeAttribute('src')});
 }
 function renderRanking(){
