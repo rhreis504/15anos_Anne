@@ -380,7 +380,7 @@ function renderGallery(){
 let galleryFirstLoad=true;
 function refresh(){
  if(galleryFirstLoad){el('gallery').innerHTML='<div class="empty">Carregando galeria…</div>';el('gallery-load').hidden=false}
- google.script.run.withSuccessHandler(items=>{galleryItems=items||[];renderGallery();renderRanking();galleryFirstLoad=false;el('gallery-load').hidden=true})
+ google.script.run.withSuccessHandler(items=>{const next=items||[];const changed=JSON.stringify(next.map(i=>[i.id,i.likes]))!==JSON.stringify(galleryItems.map(i=>[i.id,i.likes]));galleryItems=next;if(changed||galleryFirstLoad){renderGallery();renderRanking()}galleryFirstLoad=false;el('gallery-load').hidden=true})
  .withFailureHandler(e=>{galleryFirstLoad=false;el('gallery-load').hidden=true;status('Não foi possível carregar a galeria: '+e.message);el('gallery').innerHTML='<div class="empty">Não foi possível carregar os momentos. Atualize a página.</div>'}).listMedia()
 }
 document.querySelectorAll('[data-filter]').forEach(btn=>btn.addEventListener('click',()=>{activeFilter=btn.dataset.filter;document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('active',b===btn));renderGallery()}));
