@@ -19,3 +19,11 @@ O arquivo `v2/index.html` ainda chama `google.script.run`, indisponível no GitH
 
 ## Critério de publicação
 Não substituir `index.html` da raiz até testar todas as funções e obter autorização para publicação. Manter a implantação atual do Apps Script intacta.
+
+## Protótipo de integração (branch de homologação)
+- `v2/bridge.js`: adaptador para as chamadas da interface.
+- `v2/config.js`: URL de homologação ainda vazia.
+- `v2/backend/Bridge.html`: protótipo de ponte com filtro de origem.
+- A ponte **não está implantada nem validada**. O HtmlService do Apps Script utiliza iframes internos e pode impedir a comunicação direta entre GitHub Pages e o iframe; portanto, **não considerar este transporte pronto para produção**.
+- Não alterar a implantação de produção do Apps Script até escolher e testar um canal HTTP/servidor compatível, especialmente para uploads.
+- Os arquivos originais e o backend existente permanecem intocados.
