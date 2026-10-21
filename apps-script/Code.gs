@@ -43,3 +43,21 @@ function uploadMedia(item) {
   catch(e) { file.setTrashed(true); throw Error('Não foi possível liberar visualização do arquivo. Verifique permissões do Drive.'); }
   return {id:file.getId(),name:file.getName()};
 }
+
+/**
+ * Recupera mídia exclusivamente da pasta do evento para visualização e download
+ * dentro do site. Não expõe URLs de download do Google Drive na interface.
+ * Limite de 15 MB por arquivo, conforme limite atual de upload.
+ */
+function getMediaData(fileId) {
+  if(typeof fileId!=='string' || !/^[a-zA-Z0-9_-]{10,}$/.test(fileId)) throw Error('Identificador inválido.');
+  const file=DriveApp.getFileById(fileId);
+  const parents=file.getParents();
+  let belongs=false;
+  while(parents.hasNext()) if(parents.next().getId()===CONFIG.FOLDER_ID) belongs=true;
+  if(!belongs) throw Error('Arquivo não pertence ao álbum.');
+  const mime=file.getMimeType();
+  if(!CONFIG.ALLOWED.includes(mime)) throw Error('Formato não permitido.');
+  if(file.getSize()>CONFIG.MAX_BYTES) throw Error('Arquivo acima do limite de visualização direta (15 MB).');
+  return {name:file.getName(),mime:mime,base64:Utilities.base64Encode(file.getBlob().getBytes())};
+}
