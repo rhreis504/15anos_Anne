@@ -132,6 +132,16 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 .scroll-note{margin-top:16px}
 }
 @media(max-width:360px){.hero-photo{height:300px}.hero-inner{padding-left:23px;padding-right:23px}}
+
+/* v1.4.4: imagem mobile real no DOM, não dependente de CSS background */
+.hero-photo{display:none}
+@media(max-width:620px){
+.hero-photo{display:block;position:relative;flex:0 0 auto;width:100%;height:auto;min-height:0;aspect-ratio:3/4;overflow:hidden;background:#432432}
+.hero-photo img{display:block;width:100%;height:100%;position:absolute;inset:0;object-fit:cover;object-position:center 30%}
+.hero-photo:after{content:"";position:absolute;inset:65% 0 0;background:linear-gradient(transparent,#29121e);pointer-events:none}
+.hero{overflow:hidden}
+.hero-inner{position:relative;z-index:2}
+}
 </style>
 </head>
 <body>
@@ -140,7 +150,7 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
   <a href="#momentos">Ver galeria ↓</a>
 </nav>
 <header class="hero">
-  <div class="hero-photo" aria-hidden="true"></div>
+  <div class="hero-photo" aria-hidden="true"><img src="https://raw.githubusercontent.com/rhreis504/15anos_Anne/main/anne-mobile.png" alt="" loading="eager" decoding="async" referrerpolicy="no-referrer"></div>
   <div class="hero-inner">
     <div class="overline">Uma noite para sempre</div>
     <div class="ornament" aria-hidden="true">✦</div>
