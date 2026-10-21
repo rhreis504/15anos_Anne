@@ -1,1 +1,58 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>15 anos da Anne</title><style>*{box-sizing:border-box}body{margin:0;background:#090909;color:#f7f3ed;font:16px system-ui}header{text-align:center;padding:65px 20px}h1,h2{font-family:Georgia,serif;font-weight:400}h1{font-size:clamp(48px,10vw,90px);margin:12px}p{color:#c7c0ba}button,.download{border:1px solid #aaa;border-radius:30px;padding:13px 19px;background:#fff;color:#111;font-weight:600;cursor:pointer;text-decoration:none}button.alt{background:transparent;color:#fff}main{max-width:1100px;margin:auto;padding:20px}#gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}.card{background:#222;border-radius:12px;overflow:hidden}.card img{width:100%;aspect-ratio:1;object-fit:cover}.card .meta{padding:10px}.card a{color:white;font-size:13px}#status{padding:15px;text-align:center}input{display:none}.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.empty{text-align:center;padding:40px;border:1px dashed #555}</style></head><body><header><div style="letter-spacing:.3em">UMA NOITE PARA SEMPRE</div><h1>15 anos da Anne</h1><p>Momentos inesquecíveis, compartilhados por quem viveu cada instante.</p><div class="actions"><button onclick="document.getElementById('camera').click()">Tirar foto</button><button class="alt" onclick="document.getElementById('files').click()">Enviar fotos e vídeos</button></div><input id="camera" type="file" accept="image/*" capture="environment"><input id="files" type="file" accept="image/*,video/*" multiple><div id="status" role="status"></div></header><main><h2>Nossos momentos</h2><p>Explore as lembranças da festa e baixe suas favoritas.</p><div id="gallery"><div class="empty">Carregando momentos…</div></div></main><script>const el=id=>document.getElementById(id);function status(s){el('status').textContent=s}function refresh(){google.script.run.withSuccessHandler(items=>{const root=el('gallery');root.replaceChildren();if(!items.length){root.innerHTML='<div class="empty">Seja o primeiro a compartilhar um momento!</div>';return}for(const item of items){const card=document.createElement('article');card.className='card';const link=document.createElement('a');link.href=item.view;link.target='_blank';link.rel='noopener';const pic=document.createElement('img');pic.loading='lazy';pic.alt='Momento da festa';pic.src=item.thumb;link.append(pic);const meta=document.createElement('div');meta.className='meta';const a=document.createElement('a');a.href=item.download;a.target='_blank';a.rel='noopener';a.textContent=item.type.startsWith('video/')?'Assistir / baixar vídeo':'Visualizar / baixar foto';meta.append(a);card.append(link,meta);root.append(card)}}).withFailureHandler(e=>status('Não foi possível carregar a galeria: '+e.message)).listMedia()}async function send(files){const selected=[...files];if(!selected.length)return;for(let i=0;i<selected.length;i++){const f=selected[i];if(f.size>15*1024*1024){status('Arquivo '+f.name+' ultrapassa 15 MB. Envie um arquivo menor.');continue}status('Enviando '+(i+1)+' de '+selected.length+': '+f.name);try{const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=reject;reader.readAsDataURL(f)});await new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).uploadMedia({name:f.name,mime:f.type,base64:data}));status('Enviado '+(i+1)+' de '+selected.length);refresh()}catch(e){status('Falha ao enviar '+f.name+': '+e.message);return}}status('Envio concluído!')}el('camera').onchange=e=>send(e.target.files);el('files').onchange=e=>send(e.target.files);refresh();setInterval(refresh,30000)</script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>15 anos da Anne</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090909;color:#f7f3ed;font:16px system-ui}
+header{text-align:center;padding:65px 20px}
+h1,h2{font-family:Georgia,serif;font-weight:400}
+h1{font-size:clamp(48px,10vw,90px);margin:12px}
+p{color:#c7c0ba}
+button,.download{border:1px solid #aaa;border-radius:30px;padding:13px 19px;background:#fff;color:#111;font-weight:600;cursor:pointer;text-decoration:none}
+button.alt{background:transparent;color:#fff}
+main{max-width:1100px;margin:auto;padding:20px}
+#gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.card{background:#222;border-radius:12px;overflow:hidden}
+.card img{width:100%;aspect-ratio:1;object-fit:cover}
+.card .meta{padding:10px}
+.card a{color:white;font-size:13px}
+#status{padding:15px;text-align:center}
+input{display:none}
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.empty{text-align:center;padding:40px;border:1px dashed #555}
+</style>
+</head>
+<body>
+<header>
+<div style="letter-spacing:.3em">UMA NOITE PARA SEMPRE</div>
+<h1>15 anos da Anne</h1>
+<p>Momentos inesquecíveis, compartilhados por quem viveu cada instante.</p>
+<div class="actions">
+<button onclick="document.getElementById('camera').click()">Tirar foto</button>
+<button class="alt" onclick="document.getElementById('files').click()">Enviar fotos e vídeos</button>
+</div>
+<input id="camera" type="file" accept="image/*" capture="environment">
+<input id="files" type="file" accept="image/*,video/*" multiple>
+<div id="status" role="status">
+</div>
+</header>
+<main>
+<h2>Nossos momentos</h2>
+<p>Explore as lembranças da festa e baixe suas favoritas.</p>
+<div id="gallery">
+<div class="empty">Carregando momentos…</div>
+</div>
+</main>
+<script>
+const el=id=>document.getElementById(id);function status(s){el('status').textContent=s}
+function refresh(){google.script.run.withSuccessHandler(items=>{const root=el('gallery');root.replaceChildren();if(!items.length){root.innerHTML='<div class="empty">Seja o primeiro a compartilhar um momento!</div>';return}
+for(const item of items){const card=document.createElement('article');card.className='card';const link=document.createElement('a');link.href=item.view;link.target='_blank';link.rel='noopener';const pic=document.createElement('img');pic.loading='lazy';pic.alt='Momento da festa';pic.src=item.thumb;link.append(pic);const meta=document.createElement('div');meta.className='meta';const a=document.createElement('a');a.href=item.download;a.target='_blank';a.rel='noopener';a.textContent=item.type.startsWith('video/')?'Assistir / baixar vídeo':'Visualizar / baixar foto';meta.append(a);card.append(link,meta);root.append(card)}}).withFailureHandler(e=>status('Não foi possível carregar a galeria: '+e.message)).listMedia()}
+async function send(files){const selected=[...files];if(!selected.length)return;for(let i=0;i<selected.length;i++){const f=selected[i];if(f.size>15*1024*1024){status('Arquivo '+f.name+' ultrapassa 15 MB. Envie um arquivo menor.');continue}
+status('Enviando '+(i+1)+' de '+selected.length+': '+f.name);try{const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=reject;reader.readAsDataURL(f)});await new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).uploadMedia({name:f.name,mime:f.type,base64:data}));status('Enviado '+(i+1)+' de '+selected.length);refresh()}
+catch(e){status('Falha ao enviar '+f.name+': '+e.message);return}}status('Envio concluído!')}el('camera').onchange=e=>send(e.target.files);el('files').onchange=e=>send(e.target.files);refresh();setInterval(refresh,30000)
+</script>
+</body>
+</html>
