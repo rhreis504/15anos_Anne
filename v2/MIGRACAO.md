@@ -1,3 +1,7 @@
+# ATUALIZAÇÃO 2.1: ARQUITETURA REVISADA
+
+A proposta de GitHub Pages + iframe/bridge foi descartada como implantação principal. A homologação agora utiliza `apps-script/V2.html` no próprio Google Apps Script, com Google Drive como repositório de mídia. Consulte `v2/HOMOLOGACAO_V2_1.md`. Arquivos de bridge são experimentais e não devem ser publicados.
+
 # Anne XV v2.0.0 — migração GitHub Pages
 
 Status: **em desenvolvimento; não publicar como versão oficial**.
