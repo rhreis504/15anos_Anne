@@ -10,7 +10,7 @@
 ## Implantação (necessária para funcionamento)
 1. Na conta Google pessoal que possui a pasta `15Anos_Anne`, abra https://script.google.com e crie um projeto.
 2. Cole `apps-script/Code.gs` no arquivo `Code.gs`.
-3. Crie arquivo HTML com nome **Index** e cole `apps-script/Index.html`.
+3. A interface HTML conectada ainda precisa ser adicionada como arquivo **Index** no projeto Apps Script; o template atual é apenas ilustrativo.
 4. Clique em **Implantar > Nova implantação > App da Web**.
 5. Executar como **Eu**; acesso **Qualquer pessoa**. Autorize o acesso ao Google Drive com sua conta.
 6. Copie a URL terminada em `/exec` e teste em janela anônima com uma foto pequena.
