@@ -301,7 +301,10 @@ function loadPreview(item,img){
  mediaRpc(item.id).then(data=>{
   const url=URL.createObjectURL(mediaBlob(data));
   previewCache.set(item.id,url);
-  if(img.isConnected)img.src=url;
+  if(!img.isConnected)return;
+  if(data.mime.startsWith('video/')){
+   const video=document.createElement('video');video.src=url;video.muted=true;video.playsInline=true;video.preload='auto';video.setAttribute('aria-label','Prévia do vídeo');img.replaceWith(video);
+  }else img.src=url;
  }).catch(()=>{img.alt='Toque para visualizar';img.removeAttribute('src')});
 }
 function renderRanking(){
