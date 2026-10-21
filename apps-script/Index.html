@@ -328,7 +328,7 @@ function renderRanking(){
  top.forEach((item,index)=>{
   const card=document.createElement('article');card.className='ranking-card';
   const button=document.createElement('button');button.type='button';button.setAttribute('aria-label','Visualizar momento do ranking');button.onclick=()=>openViewer(item);
-  const img=document.createElement('img');img.loading='lazy';img.alt='';img.src=item.thumb;img.onerror=()=>loadPreview(item,img);button.append(img);
+  const img=document.createElement('img');img.loading='lazy';img.alt='';img.src=item.thumb;img.onerror=()=>schedulePreview(item,img);button.append(img);
   const info=document.createElement('div');info.className='ranking-detail';
   const pos=document.createElement('span');pos.className='ranking-position';pos.textContent=(index+1)+'º lugar';
   const count=document.createElement('span');count.className='ranking-likes';count.textContent='♥ '+(item.likes||0);
@@ -353,7 +353,7 @@ function renderGallery(){
  for(const item of items){
   const card=document.createElement('article');card.className='card';
   const preview=document.createElement('button');preview.type='button';preview.className='media-open';preview.setAttribute('aria-label','Visualizar '+(item.name||'momento'));preview.onclick=()=>openViewer(item);
-  const pic=document.createElement('img');pic.loading='lazy';pic.alt='';pic.src=item.thumb;pic.onerror=()=>loadPreview(item,pic);preview.append(pic);card.append(preview);
+  const pic=document.createElement('img');pic.loading='lazy';pic.alt='';pic.src=item.thumb;pic.onerror=()=>schedulePreview(item,pic);preview.append(pic);card.append(preview);
   if(item.type.startsWith('video/')){const tag=document.createElement('span');tag.className='video-tag';tag.textContent='▶ Vídeo';card.append(tag)}
   const fav=document.createElement('button');fav.className='fav-button';fav.type='button';fav.setAttribute('aria-label',(likedIds.has(item.id)?'Descurtir':'Curtir')+' momento, '+(item.likes||0)+' curtidas');fav.setAttribute('aria-pressed',String(likedIds.has(item.id)));const heart=document.createElement('span');heart.textContent=likedIds.has(item.id)?'♥':'♡';const count=document.createElement('span');count.className='fav-count';count.textContent=String(item.likes||0);fav.append(heart,count);fav.onclick=()=>likeMoment(item,fav);card.append(fav);
   const actions=document.createElement('div');actions.className='media-actions';const see=document.createElement('button');see.type='button';see.textContent='Visualizar';see.onclick=()=>openViewer(item);const down=document.createElement('button');down.type='button';down.textContent='↓ Baixar';down.onclick=async()=>{await openViewer(item);if(selectedMedia===item&&activeObjectUrl)downloadCurrent()};actions.append(see,down);card.append(actions);root.append(card)
