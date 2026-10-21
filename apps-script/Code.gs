@@ -11,8 +11,9 @@ const CONFIG = Object.freeze({
   MAX_BATCH: 12,
   ALLOWED: ['image/jpeg','image/png','image/webp','image/heic','image/heif','video/mp4','video/quicktime','video/webm']
 });
-function doGet() {
-  return HtmlService.createHtmlOutputFromFile('Index')
+function doGet(e) {
+  const isV2 = e && e.parameter && e.parameter.version === '2';
+  return HtmlService.createHtmlOutputFromFile(isV2 ? 'V2' : 'Index')
     .setTitle('15 anos da Anne | Momentos')
     .addMetaTag('viewport','width=device-width, initial-scale=1');
 }
