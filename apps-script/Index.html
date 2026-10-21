@@ -154,6 +154,32 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 .actions{max-width:390px}
 }
 @media(max-width:360px){.hero{padding-left:14px;padding-right:14px}.hero-inner{padding-left:9px;padding-right:9px}}
+
+/* v1.5.0 — visualizador e progresso de envio */
+.media-open{display:block;width:100%;padding:0;border:0;background:transparent;text-align:left;cursor:zoom-in}
+.media-open img{width:100%;display:block}
+.media-actions{display:flex;gap:8px;padding:10px}
+.media-actions button{flex:1;min-height:39px;border:1px solid #eac39b;border-radius:24px;background:#efc99d;color:#351623;font-size:12px;font-weight:700}
+.media-actions button:first-child{background:transparent;color:#ffe7d0}
+.upload-progress{display:none;margin:14px auto 0;max-width:420px;text-align:left}
+.upload-progress.visible{display:block}
+.upload-progress .progress-track{height:9px;background:#fff3;border-radius:20px;overflow:hidden;margin-top:7px}
+.upload-progress .progress-fill{height:100%;width:0;background:linear-gradient(90deg,#b93f62,#f0c99d);transition:width .2s}
+.upload-progress .progress-track.waiting .progress-fill{width:35%!important;animation:upload-wait 1.3s ease-in-out infinite alternate}
+@keyframes upload-wait{from{transform:translateX(-95%)}to{transform:translateX(285%)}}
+.upload-progress small{display:block;color:#f6d8ca;margin-top:5px}
+.viewer{position:fixed;inset:0;z-index:9999;background:#170b13ed;display:none;align-items:center;justify-content:center;padding:14px}
+.viewer.open{display:flex}
+.viewer-panel{width:min(100%,1000px);max-height:96dvh;display:flex;flex-direction:column;gap:12px;background:#29131f;border:1px solid #d9ad87;border-radius:15px;padding:14px;box-shadow:0 20px 70px #000a}
+.viewer-head{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#f4d0a6}
+.viewer-head strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.viewer-close,.viewer-download{border:1px solid #efc99d;border-radius:24px;padding:9px 15px;background:transparent;color:#f8ddc0}
+.viewer-close{font-size:22px;line-height:1}
+.viewer-body{min-height:100px;overflow:auto;display:grid;place-items:center;color:#f2d5bf}
+.viewer-body img,.viewer-body video{display:block;max-width:100%;max-height:72dvh;object-fit:contain;border-radius:6px}
+.viewer-download{background:#efc99d;color:#351623;font-weight:700;align-self:center;min-width:140px}
+.viewer-download:disabled{opacity:.55}
+@media(max-width:620px){.viewer{padding:8px}.viewer-panel{max-height:94dvh;padding:10px}.viewer-body img,.viewer-body video{max-height:67dvh}}
 </style>
 </head>
 <body>
@@ -175,7 +201,7 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
     </div>
     <input id="camera" type="file" accept="image/*" capture="environment">
     <input id="files" type="file" accept="image/*,video/*" multiple>
-    <div id="status" role="status" aria-live="polite"></div>
+    <div id="status" role="status" aria-live="polite"></div><div id="upload-progress" class="upload-progress" role="progressbar" aria-label="Progresso do envio" aria-valuemin="0" aria-valuemax="100"><div id="progress-label">Preparando arquivos…</div><div id="progress-track" class="progress-track"><div id="progress-fill" class="progress-fill"></div></div><small id="progress-detail"></small></div>
     <a class="scroll-note" href="#momentos">Descubra os momentos <span>⌄</span></a>
   </div>
 </header>
@@ -186,30 +212,45 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
     <div class="divider-flower" aria-hidden="true">✧</div>
     <p>Cada sorriso merece ser lembrado. Veja as fotos, assista aos vídeos e guarde suas lembranças favoritas.</p>
   </div>
-  <div class="gallery-tools" role="group" aria-label="Filtrar momentos"><button type="button" data-filter="all" class="active">Todos</button><button type="button" data-filter="image">Fotos</button><button type="button" data-filter="video">Vídeos</button><button type="button" data-filter="favorite">♡ Favoritos</button></div>\n  <div id="gallery"><div class="empty">Carregando momentos especiais…</div></div>
+  <div class="gallery-tools" role="group" aria-label="Filtrar momentos"><button type="button" data-filter="all" class="active">Todos</button><button type="button" data-filter="image">Fotos</button><button type="button" data-filter="video">Vídeos</button><button type="button" data-filter="favorite">♡ Favoritos</button></div>
+  <div id="gallery"><div class="empty">Carregando momentos especiais…</div></div>
 </main>
 <footer><strong>Anne</strong>Uma noite para sempre · 15 anos</footer>
-<script>
+<div id="viewer" class="viewer" role="dialog" aria-modal="true" aria-label="Visualizador de momentos"><div class="viewer-panel"><div class="viewer-head"><strong id="viewer-title">Momento especial</strong><button type="button" id="viewer-close" class="viewer-close" aria-label="Fechar visualizador">×</button></div><div id="viewer-body" class="viewer-body"></div><button type="button" id="viewer-download" class="viewer-download" disabled>↓ Baixar arquivo</button></div></div>\n<script>
 const el=id=>document.getElementById(id);let galleryItems=[],activeFilter='all';const favorites=new Set();function status(s){el('status').textContent=s}
+let activeObjectUrl=null,selectedMedia=null,mediaLoading=false;
+function mediaRpc(id){return new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getMediaData(id))}
+function mediaBlob(data){const binary=atob(data.base64);const bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return new Blob([bytes],{type:data.mime})}
+function closeViewer(){el('viewer').classList.remove('open');el('viewer-body').replaceChildren();if(activeObjectUrl){URL.revokeObjectURL(activeObjectUrl);activeObjectUrl=null}selectedMedia=null;el('viewer-download').disabled=true;document.body.style.overflow=''}
+async function openViewer(item){closeViewer();selectedMedia=item;el('viewer-title').textContent=item.name||'Momento da Anne';el('viewer').classList.add('open');document.body.style.overflow='hidden';el('viewer-body').textContent='Carregando momento…';el('viewer-download').disabled=true;try{const data=await mediaRpc(item.id);if(selectedMedia!==item)return;const blob=mediaBlob(data);activeObjectUrl=URL.createObjectURL(blob);el('viewer-body').replaceChildren();const media=document.createElement(data.mime.startsWith('video/')?'video':'img');media.src=activeObjectUrl;if(media.tagName==='VIDEO'){media.controls=true;media.playsInline=true;media.preload='metadata'}else media.alt='Fotografia da festa';el('viewer-body').append(media);el('viewer-download').disabled=false}catch(e){if(selectedMedia===item)el('viewer-body').textContent='Não foi possível abrir o arquivo: '+(e.message||e)}}
+function downloadCurrent(){if(!selectedMedia||!activeObjectUrl)return;const a=document.createElement('a');a.href=activeObjectUrl;a.download=selectedMedia.name||'momento-anne';document.body.append(a);a.click();a.remove()}
+el('viewer-close').onclick=closeViewer;el('viewer-download').onclick=downloadCurrent;el('viewer').onclick=e=>{if(e.target===el('viewer'))closeViewer()};document.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewer()});
 function renderGallery(){
  const root=el('gallery');root.replaceChildren();
  const items=galleryItems.filter(item=>activeFilter==='all'||(activeFilter==='favorite'?favorites.has(item.id||item.view):item.type.startsWith(activeFilter+'/')));
  if(!items.length){const empty=document.createElement('div');empty.className='empty';empty.textContent=activeFilter==='favorite'?'Toque no coração de uma foto para guardá-la nesta sessão.':'Seja o primeiro a compartilhar um momento!';root.append(empty);return}
  for(const item of items){
   const card=document.createElement('article');card.className='card';
-  const link=document.createElement('a');link.href=item.view;link.target='_blank';link.rel='noopener';
-  const pic=document.createElement('img');pic.loading='lazy';pic.alt='Momento da festa';pic.src=item.thumb;link.append(pic);
-  card.append(link);
+  const preview=document.createElement('button');preview.type='button';preview.className='media-open';preview.setAttribute('aria-label','Visualizar '+(item.name||'momento'));preview.onclick=()=>openViewer(item);
+  const pic=document.createElement('img');pic.loading='lazy';pic.alt='Momento da festa';pic.src=item.thumb;preview.append(pic);card.append(preview);
   if(item.type.startsWith('video/')){const tag=document.createElement('span');tag.className='video-tag';tag.textContent='▶ Vídeo';card.append(tag)}
   const fav=document.createElement('button');fav.className='fav-button';fav.type='button';fav.setAttribute('aria-label','Marcar como favorito');const key=item.id||item.view;fav.setAttribute('aria-pressed',String(favorites.has(key)));fav.textContent=favorites.has(key)?'♥':'♡';fav.onclick=()=>{if(favorites.has(key))favorites.delete(key);else favorites.add(key);renderGallery()};card.append(fav);
-  const meta=document.createElement('div');meta.className='meta';const a=document.createElement('a');a.href=item.download;a.target='_blank';a.rel='noopener';a.textContent=item.type.startsWith('video/')?'Assistir / baixar vídeo':'Visualizar / baixar foto';meta.append(a);card.append(meta);root.append(card)
+  const actions=document.createElement('div');actions.className='media-actions';const see=document.createElement('button');see.type='button';see.textContent='Visualizar';see.onclick=()=>openViewer(item);const down=document.createElement('button');down.type='button';down.textContent='↓ Baixar';down.onclick=async()=>{await openViewer(item);if(selectedMedia===item&&activeObjectUrl)downloadCurrent()};actions.append(see,down);card.append(actions);root.append(card)
  }
 }
 function refresh(){google.script.run.withSuccessHandler(items=>{galleryItems=items||[];renderGallery()}).withFailureHandler(e=>status('Não foi possível carregar a galeria: '+e.message)).listMedia()}
 document.querySelectorAll('[data-filter]').forEach(btn=>btn.addEventListener('click',()=>{activeFilter=btn.dataset.filter;document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('active',b===btn));renderGallery()}));
-async function send(files){const selected=[...files];if(!selected.length)return;for(let i=0;i<selected.length;i++){const f=selected[i];if(f.size>15*1024*1024){status('Arquivo '+f.name+' ultrapassa 15 MB. Envie um arquivo menor.');continue}
-status('Enviando '+(i+1)+' de '+selected.length+': '+f.name);try{const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=reject;reader.readAsDataURL(f)});await new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).uploadMedia({name:f.name,mime:f.type,base64:data}));status('Enviado '+(i+1)+' de '+selected.length);refresh()}
-catch(e){status('Falha ao enviar '+f.name+': '+e.message);return}}status('Envio concluído!')}el('camera').onchange=e=>send(e.target.files);el('files').onchange=e=>send(e.target.files);refresh();setInterval(refresh,30000)
+let sending=false;
+function progress(percent,label,detail,waiting=false){const box=el('upload-progress');box.classList.add('visible');el('progress-label').textContent=label;el('progress-detail').textContent=detail;el('progress-fill').style.width=percent+'%';el('progress-track').classList.toggle('waiting',waiting);box.setAttribute('aria-valuenow',waiting?'':String(Math.round(percent)));box.setAttribute('aria-valuetext',waiting?'Aguardando confirmação do servidor':Math.round(percent)+'%')}
+async function send(files){const selected=[...files];if(!selected.length||sending)return;sending=true;let completed=0;try{for(let i=0;i<selected.length;i++){const f=selected[i];if(f.size>15*1024*1024){status('Arquivo '+f.name+' ultrapassa 15 MB. Envie um arquivo menor.');continue}
+progress(completed/selected.length*100,'Arquivo '+(i+1)+' de '+selected.length+': '+f.name,'Preparando arquivo…');
+try{const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onprogress=e=>{if(e.lengthComputable)progress((completed+e.loaded/e.total*.35)/selected.length*100,'Arquivo '+(i+1)+' de '+selected.length+': '+f.name,'Lendo arquivo no dispositivo…')};reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=()=>reject(Error('Falha ao ler arquivo'));reader.readAsDataURL(f)});
+progress(completed/selected.length*100,'Arquivo '+(i+1)+' de '+selected.length+': '+f.name,'Enviando ao Google Drive…',true);
+await new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).uploadMedia({name:f.name,mime:f.type,base64:data}));
+completed++;progress(completed/selected.length*100,completed+' de '+selected.length+' arquivos enviados','Upload confirmado');refresh()
+}catch(e){status('Falha ao enviar '+f.name+': '+(e.message||e));progress(completed/selected.length*100,'Envio interrompido','Verifique o arquivo e tente novamente');return}}
+status('Envio concluído!');progress(100,'Envio concluído!',completed+' arquivo(s) enviado(s) com sucesso')}finally{sending=false;el('camera').value='';el('files').value=''}}
+el('camera').onchange=e=>send(e.target.files);el('files').onchange=e=>send(e.target.files);refresh();setInterval(refresh,30000)
 </script>
 </body>
 </html>
