@@ -1,0 +1,18 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"></head><body><script>
+(function(){
+ const allowed='https://rhreis504.github.io';
+ const actions=['listMedia','registerGuest','getGuestVotes','registrarCurtida','uploadMedia','getMediaData'];
+ window.addEventListener('message',function(event){
+  if(event.origin!==allowed||!event.data||event.data.channel!=='anne-v2'||!actions.includes(event.data.method))return;
+  const id=event.data.id;
+  if(typeof id!=='string'||id.length>100)return;
+  const args=Array.isArray(event.data.args)?event.data.args:[];
+  google.script.run.withSuccessHandler(function(value){
+   event.source.postMessage({channel:'anne-v2-result',id:id,ok:true,value:value},event.origin);
+  }).withFailureHandler(function(err){
+   event.source.postMessage({channel:'anne-v2-result',id:id,ok:false,error:String(err&&err.message||err)},event.origin);
+  })[event.data.method].apply(null,args);
+ });
+ parent.postMessage({channel:'anne-v2-ready'},allowed);
+})();
+</script></body></html>
