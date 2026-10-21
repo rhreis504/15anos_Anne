@@ -230,7 +230,7 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 .ranking-card button[data-preview]:after,.media-open[data-preview]:after{content:attr(data-preview);position:absolute;top:50%;left:0;width:100%;transform:translateY(-50%);text-align:center;color:#f3d5bd;font-size:13px;pointer-events:none}
 </style>
 </head>
-<body><div id="guest-welcome" class="guest-welcome" hidden><div class="guest-box"><h2>Bem-vindo à festa da Anne!</h2><p>Como podemos chamar você?</p><form id="guest-form"><input id="guest-name" placeholder="Seu primeiro nome" maxlength="50" required><button type="submit">Entrar na festa</button></form><div id="guest-selfie" hidden><div class="welcome-ornament">✦ ♡ ✦</div><h3 id="guest-invitation-title">Você faz parte dessa história!</h3><p>Que alegria ter você aqui! Antes de aproveitar a festa, que tal deixar uma lembrança especial para a Anne?</p><p>Deixe um recadinho em vídeo para ela guardar suas palavras com carinho, ou tire uma selfie para ela lembrar do seu sorriso nessa noite tão especial.</p><p class="welcome-note">As imagens enviadas aparecerão na galeria e poderão ser vistas e baixadas pelos convidados.</p><button type="button" id="guest-video">♡ Deixar um recadinho em vídeo</button><button type="button" id="guest-camera">✧ Tirar uma selfie para a Anne</button><button type="button" id="guest-skip">Agora não, quero entrar</button></div><div id="guest-error" role="status"></div></div></div>
+<body><div id="guest-welcome" class="guest-welcome" hidden><div class="guest-box"><h2>Bem-vindo à festa da Anne!</h2><p id="guest-name-question">Como podemos chamar você?</p><form id="guest-form"><input id="guest-name" placeholder="Seu primeiro nome" maxlength="50" required><button type="submit">Entrar na festa</button></form><div id="guest-selfie" hidden><div class="welcome-ornament">✦ ♡ ✦</div><h3 id="guest-invitation-title">Você faz parte dessa história!</h3><p>Que alegria ter você aqui! Antes de aproveitar a festa, que tal deixar uma lembrança especial para a Anne?</p><p>Deixe um recadinho em vídeo para ela guardar suas palavras com carinho, ou tire uma selfie para ela lembrar do seu sorriso nessa noite tão especial.</p><p class="welcome-note">As imagens enviadas aparecerão na galeria e poderão ser vistas e baixadas pelos convidados.</p><button type="button" id="guest-video">♡ Deixar um recadinho em vídeo</button><button type="button" id="guest-camera">✧ Tirar uma selfie para a Anne</button><button type="button" id="guest-skip">Agora não, quero entrar</button></div><div id="guest-error" role="status"></div></div></div>
 <nav class="topbar" aria-label="Navegação principal">
   <div class="brand">Anne <span>XV</span></div>
   <a href="#momentos">Ver galeria ↓</a>
@@ -280,7 +280,7 @@ el('guest-form').onsubmit=e=>{
  google.script.run.withSuccessHandler(result=>{
   guestProfile={name:result.name,id:id};
   try{localStorage.setItem('anne_guest_v1',JSON.stringify(guestProfile))}catch(e){}
-  el('guest-form').hidden=true;el('guest-selfie').hidden=false;
+  el('guest-form').hidden=true;el('guest-name-question').hidden=true;el('guest-selfie').hidden=false;
   el('guest-invitation-title').textContent=result.name+', você faz parte dessa história!';
  }).withFailureHandler(err=>{el('guest-error').textContent=err.message||String(err)}).registerGuest(name,id);
 };
