@@ -155,19 +155,25 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 }
 @media(max-width:360px){.hero{padding-left:14px;padding-right:14px}.hero-inner{padding-left:9px;padding-right:9px}}
 
+/* v1.5.1 — status fixo no celular e carregamento da galeria */
+.gallery-loading{max-width:400px;margin:0 auto 22px;text-align:center;color:#f0c99d}
+.gallery-loading[hidden]{display:none}
+.gallery-loading-track{height:7px;background:#ffffff25;border-radius:20px;overflow:hidden;margin-top:9px}
+.gallery-loading-track>div{height:100%;width:36%;background:linear-gradient(90deg,#bd5073,#f0c99d);border-radius:20px;animation:gallery-loading 1.2s ease-in-out infinite alternate}
+@keyframes gallery-loading{from{transform:translateX(-100%)}to{transform:translateX(285%)}}
 /* v1.5.0 — visualizador e progresso de envio */
 .media-open{display:block;width:100%;padding:0;border:0;background:transparent;text-align:left;cursor:zoom-in}
 .media-open img{width:100%;display:block}
 .media-actions{display:flex;gap:8px;padding:10px}
 .media-actions button{flex:1;min-height:39px;border:1px solid #eac39b;border-radius:24px;background:#efc99d;color:#351623;font-size:12px;font-weight:700}
 .media-actions button:first-child{background:transparent;color:#ffe7d0}
-.upload-progress{display:none;margin:14px auto 0;max-width:420px;text-align:left}
+.upload-progress{display:none;position:fixed;z-index:9000;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(92vw,480px);margin:0;padding:16px 18px;text-align:left;background:#2a1420f5;border:1px solid #f0c99d;border-radius:16px;box-shadow:0 12px 45px #0009;backdrop-filter:blur(12px)}
 .upload-progress.visible{display:block}
 .upload-progress .progress-track{height:9px;background:#fff3;border-radius:20px;overflow:hidden;margin-top:7px}
 .upload-progress .progress-fill{height:100%;width:0;background:linear-gradient(90deg,#b93f62,#f0c99d);transition:width .2s}
 .upload-progress .progress-track.waiting .progress-fill{width:35%!important;animation:upload-wait 1.3s ease-in-out infinite alternate}
 @keyframes upload-wait{from{transform:translateX(-95%)}to{transform:translateX(285%)}}
-.upload-progress small{display:block;color:#f6d8ca;margin-top:5px}
+.upload-progress small{display:block;color:#f6d8ca;margin-top:5px}.upload-progress #progress-label{font-weight:700;color:#ffe1bd}.upload-progress #progress-detail{font-size:12px}
 .viewer{position:fixed;inset:0;z-index:9999;background:#170b13ed;display:none;align-items:center;justify-content:center;padding:14px}
 .viewer.open{display:flex}
 .viewer-panel{width:min(100%,1000px);max-height:96dvh;display:flex;flex-direction:column;gap:12px;background:#29131f;border:1px solid #d9ad87;border-radius:15px;padding:14px;box-shadow:0 20px 70px #000a}
@@ -213,10 +219,11 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
     <p>Cada sorriso merece ser lembrado. Veja as fotos, assista aos vídeos e guarde suas lembranças favoritas.</p>
   </div>
   <div class="gallery-tools" role="group" aria-label="Filtrar momentos"><button type="button" data-filter="all" class="active">Todos</button><button type="button" data-filter="image">Fotos</button><button type="button" data-filter="video">Vídeos</button><button type="button" data-filter="favorite">♡ Favoritos</button></div>
-  <div id="gallery"><div class="empty">Carregando momentos especiais…</div></div>
+  <div id="gallery-load" class="gallery-loading" role="status" aria-live="polite"><span>Carregando fotos e vídeos…</span><div class="gallery-loading-track"><div></div></div></div><div id="gallery"><div class="empty">Carregando momentos especiais…</div></div>
 </main>
 <footer><strong>Anne</strong>Uma noite para sempre · 15 anos</footer>
-<div id="viewer" class="viewer" role="dialog" aria-modal="true" aria-label="Visualizador de momentos"><div class="viewer-panel"><div class="viewer-head"><strong id="viewer-title">Momento especial</strong><button type="button" id="viewer-close" class="viewer-close" aria-label="Fechar visualizador">×</button></div><div id="viewer-body" class="viewer-body"></div><button type="button" id="viewer-download" class="viewer-download" disabled>↓ Baixar arquivo</button></div></div>\n<script>
+<div id="viewer" class="viewer" role="dialog" aria-modal="true" aria-label="Visualizador de momentos"><div class="viewer-panel"><div class="viewer-head"><strong id="viewer-title">Momento especial</strong><button type="button" id="viewer-close" class="viewer-close" aria-label="Fechar visualizador">×</button></div><div id="viewer-body" class="viewer-body"></div><button type="button" id="viewer-download" class="viewer-download" disabled>↓ Baixar arquivo</button></div></div>
+<script>
 const el=id=>document.getElementById(id);let galleryItems=[],activeFilter='all';const favorites=new Set();function status(s){el('status').textContent=s}
 let activeObjectUrl=null,selectedMedia=null,mediaLoading=false;
 function mediaRpc(id){return new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getMediaData(id))}
@@ -238,7 +245,12 @@ function renderGallery(){
   const actions=document.createElement('div');actions.className='media-actions';const see=document.createElement('button');see.type='button';see.textContent='Visualizar';see.onclick=()=>openViewer(item);const down=document.createElement('button');down.type='button';down.textContent='↓ Baixar';down.onclick=async()=>{await openViewer(item);if(selectedMedia===item&&activeObjectUrl)downloadCurrent()};actions.append(see,down);card.append(actions);root.append(card)
  }
 }
-function refresh(){google.script.run.withSuccessHandler(items=>{galleryItems=items||[];renderGallery()}).withFailureHandler(e=>status('Não foi possível carregar a galeria: '+e.message)).listMedia()}
+let galleryFirstLoad=true;
+function refresh(){
+ if(galleryFirstLoad){el('gallery').innerHTML='<div class="empty">Carregando galeria…</div>';el('gallery-load').hidden=false}
+ google.script.run.withSuccessHandler(items=>{galleryItems=items||[];renderGallery();galleryFirstLoad=false;el('gallery-load').hidden=true})
+ .withFailureHandler(e=>{galleryFirstLoad=false;el('gallery-load').hidden=true;status('Não foi possível carregar a galeria: '+e.message);el('gallery').innerHTML='<div class="empty">Não foi possível carregar os momentos. Atualize a página.</div>'}).listMedia()
+}
 document.querySelectorAll('[data-filter]').forEach(btn=>btn.addEventListener('click',()=>{activeFilter=btn.dataset.filter;document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('active',b===btn));renderGallery()}));
 let sending=false;
 function progress(percent,label,detail,waiting=false){const box=el('upload-progress');box.classList.add('visible');el('progress-label').textContent=label;el('progress-detail').textContent=detail;el('progress-fill').style.width=percent+'%';el('progress-track').classList.toggle('waiting',waiting);box.setAttribute('aria-valuenow',waiting?'':String(Math.round(percent)));box.setAttribute('aria-valuetext',waiting?'Aguardando confirmação do servidor':Math.round(percent)+'%')}
