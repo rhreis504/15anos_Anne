@@ -387,14 +387,52 @@ function refresh(){
 document.querySelectorAll('[data-filter]').forEach(btn=>btn.addEventListener('click',()=>{activeFilter=btn.dataset.filter;document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('active',b===btn));renderGallery()}));
 let sending=false;
 function progress(percent,label,detail,waiting=false){const box=el('upload-progress');box.classList.add('visible');el('progress-label').textContent=label;el('progress-detail').textContent=detail;el('progress-fill').style.width=percent+'%';el('progress-track').classList.toggle('waiting',waiting);box.setAttribute('aria-valuenow',waiting?'':String(Math.round(percent)));box.setAttribute('aria-valuetext',waiting?'Aguardando confirmação do servidor':Math.round(percent)+'%')}
-async function send(files){const selected=[...files];if(!selected.length||sending)return;sending=true;let completed=0;try{for(let i=0;i<selected.length;i++){const f=selected[i];if(f.size>15*1024*1024){status('Arquivo '+f.name+' ultrapassa 15 MB. Envie um arquivo menor.');continue}
-progress(completed/selected.length*100,'Arquivo '+(i+1)+' de '+selected.length+': '+f.name,'Preparando arquivo…');
-try{const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onprogress=e=>{if(e.lengthComputable)progress((completed+e.loaded/e.total*.35)/selected.length*100,'Arquivo '+(i+1)+' de '+selected.length+': '+f.name,'Lendo arquivo no dispositivo…')};reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=()=>reject(Error('Falha ao ler arquivo'));reader.readAsDataURL(f)});
-progress(completed/selected.length*100,'Arquivo '+(i+1)+' de '+selected.length+': '+f.name,'Enviando ao Google Drive…',true);
-await new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).uploadMedia({name:f.name,mime:f.type,base64:data}));
-completed++;progress(completed/selected.length*100,completed+' de '+selected.length+' arquivos enviados','Upload confirmado');refresh()
-}catch(e){status('Falha ao enviar '+f.name+': '+(e.message||e));progress(completed/selected.length*100,'Envio interrompido','Verifique o arquivo e tente novamente');return}}
-status('Envio concluído!');progress(100,'Envio concluído!',completed+' arquivo(s) enviado(s) com sucesso')}finally{sending=false;el('camera').value='';el('files').value='';el('guest-video-input').value=''}}
+async function compressPhoto(file){
+ if(!file.type.startsWith('image/')||!['image/jpeg','image/png','image/webp'].includes(file.type))return file;
+ if(file.size<350000)return file;
+ const bitmap=await createImageBitmap(file).catch(()=>null);
+ if(!bitmap)return file;
+ const edge=1600,ratio=Math.min(1,edge/Math.max(bitmap.width,bitmap.height));
+ const canvas=document.createElement('canvas');
+ canvas.width=Math.round(bitmap.width*ratio);canvas.height=Math.round(bitmap.height*ratio);
+ canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);
+ bitmap.close();
+ const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.76));
+ canvas.width=canvas.height=0;
+ if(!blob||blob.size>=file.size)return file;
+ return new File([blob],file.name.replace(/\\.[^.]+$/, '')+'.jpg',{type:'image/jpeg'});
+}
+function readBase64(file){return new Promise((resolve,reject)=>{
+ const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);
+ reader.onerror=()=>reject(Error('Falha ao ler arquivo'));reader.readAsDataURL(file)
+})}
+function uploadOne(file){return new Promise((resolve,reject)=>{
+ google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).uploadMedia(file)
+})}
+async function send(files){
+ const selected=[...files];if(!selected.length||sending)return;
+ sending=true;let completed=0,failed=0;
+ try{
+  for(let i=0;i<selected.length;i++){
+   const original=selected[i];
+   progress(completed/selected.length*100,'Arquivo '+(i+1)+' de '+selected.length+': '+original.name,'Preparando para enviar…');
+   try{
+    const file=await compressPhoto(original);
+    if(file.size>15*1024*1024)throw Error('Arquivo acima de 15 MB. Reduza o vídeo antes de enviar.');
+    const data=await readBase64(file);
+    progress(completed/selected.length*100,'Arquivo '+(i+1)+' de '+selected.length,'Aguardando confirmação do Google Drive…',true);
+    await uploadOne({name:file.name,mime:file.type,base64:data});
+    completed++;progress((i+1)/selected.length*100,completed+' arquivo(s) enviado(s)','Upload confirmado');
+   }catch(e){
+    failed++;status('Não foi possível enviar '+original.name+': '+(e.message||e)+'. Se necessário, selecione novamente.');
+   }
+  }
+  if(completed)refresh();
+  progress(100,completed+' enviado(s), '+failed+' não enviado(s)',failed?'Confira as mensagens e tente novamente os arquivos pendentes.':'Envio concluído.');
+ }finally{
+  sending=false;el('camera').value='';el('files').value='';el('guest-video-input').value='';
+ }
+}
 el('camera').onchange=e=>send(e.target.files);el('files').onchange=e=>send(e.target.files);refresh();setInterval(()=>{if(!document.hidden&&!sending)refresh()},60000)
 </script>
 </body>
