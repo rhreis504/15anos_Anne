@@ -269,7 +269,7 @@ const el=id=>document.getElementById(id);let galleryItems=[],activeFilter='all';
 
 let guestProfile=null;
 try{guestProfile=JSON.parse(localStorage.getItem('anne_guest_v1')||'null')}catch(e){}
-function finishWelcome(){el('guest-welcome').hidden=true;document.body.style.overflow=''}
+function finishWelcome(){const w=el('guest-welcome');w.classList.add('guest-leaving');document.body.style.overflow='';setTimeout(()=>{w.hidden=true;w.classList.remove('guest-leaving')},650)}
 if(!guestProfile||!guestProfile.name){el('guest-welcome').hidden=false;document.body.style.overflow='hidden'}
 el('guest-form').onsubmit=e=>{
  e.preventDefault();
