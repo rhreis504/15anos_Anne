@@ -89,6 +89,9 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 .gallery-tools button.active{background:#efc99d;color:#351623;border-color:#efc99d}
 .fav-button{position:absolute;top:9px;right:9px;display:grid;place-items:center;width:34px;height:34px;border:1px solid #fff9;border-radius:50%;background:#301522a6;color:#fff;font-size:21px;line-height:1}
 .fav-button[aria-pressed="true"]{color:#ffb1c6;background:#5c1b32e8}
+.fav-button{width:auto;min-width:42px;height:36px;display:flex;gap:5px;align-items:center;justify-content:center;padding:0 9px;font-size:20px;z-index:2}
+.fav-count{font:700 12px "DM Sans",sans-serif;color:#fff4e9;font-variant-numeric:tabular-nums}
+@media(max-width:620px){.fav-button{min-width:38px;height:32px;padding:0 7px;font-size:18px}.fav-count{font-size:11px}}
 .video-tag{position:absolute;top:10px;left:10px;padding:4px 9px;border-radius:20px;background:#2c1321cc;color:white;font-size:11px}
 @media(max-width:900px){.hero{min-height:590px;background-position:center,left 38% center,center}.hero-inner{max-width:480px}}
 @media(max-width:620px){
@@ -274,15 +277,14 @@ function likeMoment(item,button){
 }
 function renderGallery(){
  const root=el('gallery');root.replaceChildren();
- const items=galleryItems.filter(item=>activeFilter==='all'||(activeFilter==='favorite'?favorites.has(item.id||item.view):item.type.startsWith(activeFilter+'/')));
- if(!items.length){const empty=document.createElement('div');empty.className='empty';empty.textContent=activeFilter==='favorite'?'Toque no coração de uma foto para guardá-la nesta sessão.':'Seja o primeiro a compartilhar um momento!';root.append(empty);return}
+ const items=galleryItems.filter(item=>activeFilter==='all'||(activeFilter==='favorite'?likedIds.has(item.id):item.type.startsWith(activeFilter+'/')));
+ if(!items.length){const empty=document.createElement('div');empty.className='empty';empty.textContent=activeFilter==='favorite'?'Toque no coração de uma foto para curtir.':'Seja o primeiro a compartilhar um momento!';root.append(empty);return}
  for(const item of items){
   const card=document.createElement('article');card.className='card';
   const preview=document.createElement('button');preview.type='button';preview.className='media-open';preview.setAttribute('aria-label','Visualizar '+(item.name||'momento'));preview.onclick=()=>openViewer(item);
   const pic=document.createElement('img');pic.loading='lazy';pic.alt='Momento da festa';pic.src=item.thumb;preview.append(pic);card.append(preview);
   if(item.type.startsWith('video/')){const tag=document.createElement('span');tag.className='video-tag';tag.textContent='▶ Vídeo';card.append(tag)}
-  const fav=document.createElement('button');fav.className='fav-button';fav.type='button';fav.setAttribute('aria-label','Marcar como favorito');const key=item.id||item.view;fav.setAttribute('aria-pressed',String(favorites.has(key)));fav.textContent=favorites.has(key)?'♥':'♡';fav.onclick=()=>{if(favorites.has(key))favorites.delete(key);else favorites.add(key);renderGallery()};card.append(fav);
-  const likes=document.createElement('button');likes.type='button';likes.className='like-button';likes.setAttribute('aria-pressed',String(likedIds.has(item.id)));likes.textContent=(likedIds.has(item.id)?'♥ Curtido':'♡ Curtir')+' · '+(item.likes||0);likes.onclick=()=>likeMoment(item,likes);card.append(likes);
+  const fav=document.createElement('button');fav.className='fav-button';fav.type='button';fav.setAttribute('aria-label',(likedIds.has(item.id)?'Descurtir':'Curtir')+' momento, '+(item.likes||0)+' curtidas');fav.setAttribute('aria-pressed',String(likedIds.has(item.id)));const heart=document.createElement('span');heart.textContent=likedIds.has(item.id)?'♥':'♡';const count=document.createElement('span');count.className='fav-count';count.textContent=String(item.likes||0);fav.append(heart,count);fav.onclick=()=>likeMoment(item,fav);card.append(fav);
   const actions=document.createElement('div');actions.className='media-actions';const see=document.createElement('button');see.type='button';see.textContent='Visualizar';see.onclick=()=>openViewer(item);const down=document.createElement('button');down.type='button';down.textContent='↓ Baixar';down.onclick=async()=>{await openViewer(item);if(selectedMedia===item&&activeObjectUrl)downloadCurrent()};actions.append(see,down);card.append(actions);root.append(card)
  }
 }
