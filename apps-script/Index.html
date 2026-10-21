@@ -220,7 +220,7 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 @media(max-width:620px){.ranking-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.ranking-card:first-child{grid-column:auto}.ranking-card:first-child img{aspect-ratio:1}}
 </style>
 </head>
-<body>
+<body><div id="guest-welcome" class="guest-welcome" hidden><div class="guest-box"><h2>Bem-vindo à festa da Anne!</h2><p>Como podemos chamar você?</p><form id="guest-form"><input id="guest-name" placeholder="Seu primeiro nome" maxlength="50" required><button type="submit">Entrar na festa</button></form><div id="guest-selfie" hidden><p>Que tal começar com uma selfie? Ela aparecerá no álbum da festa.</p><button type="button" id="guest-camera">Quero tirar minha selfie</button><button type="button" id="guest-skip">Agora não</button></div><div id="guest-error" role="status"></div></div></div>
 <nav class="topbar" aria-label="Navegação principal">
   <div class="brand">Anne <span>XV</span></div>
   <a href="#momentos">Ver galeria ↓</a>
