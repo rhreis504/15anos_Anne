@@ -186,6 +186,22 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 .viewer-download{background:#efc99d;color:#351623;font-weight:700;align-self:center;min-width:140px}
 .viewer-download:disabled{opacity:.55}
 @media(max-width:620px){.viewer{padding:8px}.viewer-panel{max-height:94dvh;padding:10px}.viewer-body img,.viewer-body video{max-height:67dvh}}
+
+/* v1.6.0 — ranking público responsivo */
+.ranking-section{max-width:1260px;margin:0 auto;padding:70px clamp(15px,4vw,46px) 12px}
+.ranking-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.ranking-card{position:relative;background:#38202d;border:1px solid #d7ad82;border-radius:17px;overflow:hidden;box-shadow:0 12px 35px #0005}
+.ranking-card:first-child{border:2px solid #f0c99d;box-shadow:0 12px 38px #f0c99d24}
+.ranking-card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.ranking-card button{display:block;width:100%;border:0;background:transparent;color:inherit;padding:0}
+.ranking-detail{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;color:#f9e6d5}
+.ranking-position{font:500 18px "Playfair Display",serif;color:#f0c99d}
+.ranking-likes{font-weight:700;color:#ffc4d0}
+.ranking-empty{text-align:center;grid-column:1/-1;color:#dfc0c7;padding:36px 12px;border:1px solid #f0c99d55;border-radius:14px}
+.like-button{border:1px solid #f0c99d8c;background:#4b2938;color:#ffe5d2;border-radius:20px;padding:6px 11px;min-height:36px;font-size:13px}
+.like-button[aria-pressed="true"]{background:#b33b62;color:white;border-color:#f5bdd0}
+.like-button:disabled{opacity:.5}
+@media(max-width:620px){.ranking-section{padding:48px 12px 8px}.ranking-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.ranking-card:first-child{grid-column:1/-1}.ranking-card:first-child img{aspect-ratio:16/10}.ranking-detail{padding:9px}.ranking-position{font-size:15px}}
 </style>
 </head>
 <body>
@@ -211,7 +227,7 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
     <a class="scroll-note" href="#momentos">Descubra os momentos <span>⌄</span></a>
   </div>
 </header>
-<main id="momentos" class="section">
+<section id="ranking" class="ranking-section" aria-labelledby="ranking-title"><div class="section-top"><div class="eyebrow">Os preferidos da festa</div><h2 id="ranking-title">Momentos mais amados</h2><div class="divider-flower">✧</div><p>Os registros que conquistaram mais corações dos convidados.</p></div><div id="ranking-grid" class="ranking-grid"><div class="ranking-empty">As primeiras curtidas vão aparecer aqui.</div></div></section><main id="momentos" class="section">
   <div class="section-top">
     <div class="eyebrow">Memórias que ficam</div>
     <h2>Nossos momentos</h2>
@@ -224,7 +240,7 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 <footer><strong>Anne</strong>Uma noite para sempre · 15 anos</footer>
 <div id="viewer" class="viewer" role="dialog" aria-modal="true" aria-label="Visualizador de momentos"><div class="viewer-panel"><div class="viewer-head"><strong id="viewer-title">Momento especial</strong><button type="button" id="viewer-close" class="viewer-close" aria-label="Fechar visualizador">×</button></div><div id="viewer-body" class="viewer-body"></div><button type="button" id="viewer-download" class="viewer-download" disabled>↓ Baixar arquivo</button></div></div>
 <script>
-const el=id=>document.getElementById(id);let galleryItems=[],activeFilter='all';const favorites=new Set();function status(s){el('status').textContent=s}
+const el=id=>document.getElementById(id);let galleryItems=[],activeFilter='all';const favorites=new Set();const likedIds=new Set();try{JSON.parse(localStorage.getItem('anne_public_likes')||'[]').forEach(id=>likedIds.add(id))}catch(e){}function status(s){el('status').textContent=s}
 let activeObjectUrl=null,selectedMedia=null,mediaLoading=false;
 function mediaRpc(id){return new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getMediaData(id))}
 function mediaBlob(data){const binary=atob(data.base64);const bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return new Blob([bytes],{type:data.mime})}
@@ -232,6 +248,30 @@ function closeViewer(){el('viewer').classList.remove('open');el('viewer-body').r
 async function openViewer(item){closeViewer();selectedMedia=item;el('viewer-title').textContent=item.name||'Momento da Anne';el('viewer').classList.add('open');document.body.style.overflow='hidden';el('viewer-body').textContent='Carregando momento…';el('viewer-download').disabled=true;try{const data=await mediaRpc(item.id);if(selectedMedia!==item)return;const blob=mediaBlob(data);activeObjectUrl=URL.createObjectURL(blob);el('viewer-body').replaceChildren();const media=document.createElement(data.mime.startsWith('video/')?'video':'img');media.src=activeObjectUrl;if(media.tagName==='VIDEO'){media.controls=true;media.playsInline=true;media.preload='metadata'}else media.alt='Fotografia da festa';el('viewer-body').append(media);el('viewer-download').disabled=false}catch(e){if(selectedMedia===item)el('viewer-body').textContent='Não foi possível abrir o arquivo: '+(e.message||e)}}
 function downloadCurrent(){if(!selectedMedia||!activeObjectUrl)return;const a=document.createElement('a');a.href=activeObjectUrl;a.download=selectedMedia.name||'momento-anne';document.body.append(a);a.click();a.remove()}
 el('viewer-close').onclick=closeViewer;el('viewer-download').onclick=downloadCurrent;el('viewer').onclick=e=>{if(e.target===el('viewer'))closeViewer()};document.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewer()});
+function renderRanking(){
+ const root=el('ranking-grid');root.replaceChildren();
+ const top=[...galleryItems].filter(i=>Number(i.likes)>0).sort((a,b)=>Number(b.likes)-Number(a.likes)||b.created-a.created).slice(0,3);
+ if(!top.length){const e=document.createElement('div');e.className='ranking-empty';e.textContent='As primeiras curtidas vão aparecer aqui.';root.append(e);return}
+ top.forEach((item,index)=>{
+  const card=document.createElement('article');card.className='ranking-card';
+  const button=document.createElement('button');button.type='button';button.setAttribute('aria-label','Visualizar momento do ranking');button.onclick=()=>openViewer(item);
+  const img=document.createElement('img');img.loading='lazy';img.alt='Momento na posição '+(index+1);img.src=item.thumb;button.append(img);
+  const info=document.createElement('div');info.className='ranking-detail';
+  const pos=document.createElement('span');pos.className='ranking-position';pos.textContent=['1º lugar','2º lugar','3º lugar'][index];
+  const count=document.createElement('span');count.className='ranking-likes';count.textContent='♥ '+(item.likes||0);
+  info.append(pos,count);card.append(button,info);root.append(card);
+ })
+}
+function likeMoment(item,button){
+ if(button.disabled)return;button.disabled=true;
+ const liked=likedIds.has(item.id),delta=liked?-1:1;
+ google.script.run.withSuccessHandler(result=>{
+   item.likes=result.likes;
+   if(liked)likedIds.delete(item.id);else likedIds.add(item.id);
+   try{localStorage.setItem('anne_public_likes',JSON.stringify([...likedIds]))}catch(e){}
+   renderGallery();renderRanking()
+ }).withFailureHandler(e=>{button.disabled=false;status('Não foi possível registrar a curtida: '+(e.message||e))}).registrarCurtida(item.id,delta)
+}
 function renderGallery(){
  const root=el('gallery');root.replaceChildren();
  const items=galleryItems.filter(item=>activeFilter==='all'||(activeFilter==='favorite'?favorites.has(item.id||item.view):item.type.startsWith(activeFilter+'/')));
@@ -242,13 +282,14 @@ function renderGallery(){
   const pic=document.createElement('img');pic.loading='lazy';pic.alt='Momento da festa';pic.src=item.thumb;preview.append(pic);card.append(preview);
   if(item.type.startsWith('video/')){const tag=document.createElement('span');tag.className='video-tag';tag.textContent='▶ Vídeo';card.append(tag)}
   const fav=document.createElement('button');fav.className='fav-button';fav.type='button';fav.setAttribute('aria-label','Marcar como favorito');const key=item.id||item.view;fav.setAttribute('aria-pressed',String(favorites.has(key)));fav.textContent=favorites.has(key)?'♥':'♡';fav.onclick=()=>{if(favorites.has(key))favorites.delete(key);else favorites.add(key);renderGallery()};card.append(fav);
+  const likes=document.createElement('button');likes.type='button';likes.className='like-button';likes.setAttribute('aria-pressed',String(likedIds.has(item.id)));likes.textContent=(likedIds.has(item.id)?'♥ Curtido':'♡ Curtir')+' · '+(item.likes||0);likes.onclick=()=>likeMoment(item,likes);card.append(likes);
   const actions=document.createElement('div');actions.className='media-actions';const see=document.createElement('button');see.type='button';see.textContent='Visualizar';see.onclick=()=>openViewer(item);const down=document.createElement('button');down.type='button';down.textContent='↓ Baixar';down.onclick=async()=>{await openViewer(item);if(selectedMedia===item&&activeObjectUrl)downloadCurrent()};actions.append(see,down);card.append(actions);root.append(card)
  }
 }
 let galleryFirstLoad=true;
 function refresh(){
  if(galleryFirstLoad){el('gallery').innerHTML='<div class="empty">Carregando galeria…</div>';el('gallery-load').hidden=false}
- google.script.run.withSuccessHandler(items=>{galleryItems=items||[];renderGallery();galleryFirstLoad=false;el('gallery-load').hidden=true})
+ google.script.run.withSuccessHandler(items=>{galleryItems=items||[];renderGallery();renderRanking();galleryFirstLoad=false;el('gallery-load').hidden=true})
  .withFailureHandler(e=>{galleryFirstLoad=false;el('gallery-load').hidden=true;status('Não foi possível carregar a galeria: '+e.message);el('gallery').innerHTML='<div class="empty">Não foi possível carregar os momentos. Atualize a página.</div>'}).listMedia()
 }
 document.querySelectorAll('[data-filter]').forEach(btn=>btn.addEventListener('click',()=>{activeFilter=btn.dataset.filter;document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('active',b===btn));renderGallery()}));
