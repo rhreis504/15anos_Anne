@@ -166,7 +166,7 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 @keyframes gallery-loading{from{transform:translateX(-100%)}to{transform:translateX(285%)}}
 /* v1.5.0 — visualizador e progresso de envio */
 .media-open{display:block;width:100%;padding:0;border:0;background:transparent;text-align:left;cursor:zoom-in}
-.media-open img{width:100%;display:block}
+.media-open img,.media-open video{width:100%;display:block;aspect-ratio:4/3;object-fit:cover;pointer-events:none}
 .media-actions{display:flex;gap:8px;padding:10px}
 .media-actions button{flex:1;min-height:39px;border:1px solid #eac39b;border-radius:24px;background:#efc99d;color:#351623;font-size:12px;font-weight:700}
 .media-actions button:first-child{background:transparent;color:#ffe7d0}
@@ -193,7 +193,7 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 /* v1.6.2 — ranking dos dez momentos mais curtidos */
 .ranking-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
 .ranking-card:first-child{grid-column:auto}
-.ranking-card img{aspect-ratio:1}
+.ranking-card img,.ranking-card video{aspect-ratio:1}
 .ranking-detail{padding:10px 12px}
 @media(max-width:900px){.ranking-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:620px){.ranking-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.ranking-card:first-child{grid-column:auto}.ranking-card:first-child img{aspect-ratio:1}}
