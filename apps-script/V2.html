@@ -228,6 +228,9 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 #guest-skip{background:transparent;color:#ffe6d0}.guest-box h3{color:#ffe6d0;font:400 25px Georgia,serif}.welcome-ornament{color:#efc99d;font-size:24px;letter-spacing:8px}.welcome-note{font-size:11px;color:#e9c3cd}#guest-video{background:#f2d4ad}#guest-camera{background:#8b4860;color:#fff4eb}
 #guest-error{color:#ffd5d5;font-size:12px;margin-top:10px}
 .ranking-card button[data-preview]:after,.media-open[data-preview]:after{content:attr(data-preview);position:absolute;top:50%;left:0;width:100%;transform:translateY(-50%);text-align:center;color:#f3d5bd;font-size:13px;pointer-events:none}
+
+/* v2.1.3 — galeria mobile e prévias sob demanda */
+@media(max-width:620px){#gallery{grid-template-columns:minmax(0,1fr);gap:16px}.card .meta{padding:12px}.media-actions{padding:12px;gap:10px}.media-actions button{min-height:44px;font-size:14px}.media-open img{aspect-ratio:4/3}}
 </style>
 </head>
 <body><div id="guest-welcome" class="guest-welcome" hidden><div class="guest-box"><h2>Bem-vindo à festa da Anne!</h2><p id="guest-name-question">Como podemos chamar você?</p><form id="guest-form"><input id="guest-name" placeholder="Seu primeiro nome" maxlength="50" required><button type="submit">Entrar na festa</button></form><div id="guest-selfie" hidden><div class="welcome-ornament">✦ ♡ ✦</div><h3 id="guest-invitation-title">Você faz parte dessa história!</h3><p>Que alegria ter você aqui! Antes de aproveitar a festa, que tal deixar uma lembrança especial para a Anne?</p><p>Deixe um recadinho em vídeo para ela guardar suas palavras com carinho, ou tire uma selfie para ela lembrar do seu sorriso nessa noite tão especial.</p><p class="welcome-note">As imagens enviadas aparecerão na galeria e poderão ser vistas e baixadas pelos convidados.</p><button type="button" id="guest-video">♡ Deixar um recadinho em vídeo</button><button type="button" id="guest-camera">✧ Tirar uma selfie para a Anne</button><button type="button" id="guest-skip">Depois faço isso</button></div><div id="guest-error" role="status"></div></div></div>
@@ -365,6 +368,25 @@ function likeMoment(item,button){
    renderGallery();renderRanking()
  }).withFailureHandler(e=>{button.disabled=false;status('Não foi possível registrar a curtida: '+(e.message||e))}).registrarCurtida(item.id,delta,guestProfile&&guestProfile.id)
 }
+/* Somente imagens visíveis com miniatura bloqueada são recuperadas via Apps Script. */
+const failedThumbObserver=typeof IntersectionObserver==='function'?new IntersectionObserver(entries=>{
+ for(const entry of entries){
+  if(!entry.isIntersecting)continue;
+  failedThumbObserver.unobserve(entry.target);
+  const job=failedThumbJobs.get(entry.target);
+  failedThumbJobs.delete(entry.target);
+  if(job)schedulePreview(job.item,job.img);
+ }
+},{rootMargin:'160px 0px'}):null;
+const failedThumbJobs=new WeakMap();
+function recoverFailedThumb(item,img){
+ const parent=img.parentElement;
+ img.style.visibility='hidden';
+ parent.dataset.preview=item.type.startsWith('video/')?'▶ Toque para assistir':'Carregando foto…';
+ if(item.type.startsWith('video/'))return;
+ if(failedThumbObserver){failedThumbJobs.set(parent,{item,img});failedThumbObserver.observe(parent)}
+ else schedulePreview(item,img);
+}
 function renderGallery(){
  const root=el('gallery');root.replaceChildren();
  const items=galleryItems.filter(item=>activeFilter==='all'||(activeFilter==='favorite'?likedIds.has(item.id):item.type.startsWith(activeFilter+'/')));
@@ -372,7 +394,7 @@ function renderGallery(){
  for(const item of items){
   const card=document.createElement('article');card.className='card';
   const preview=document.createElement('button');preview.type='button';preview.className='media-open';preview.setAttribute('aria-label','Visualizar '+(item.name||'momento'));preview.onclick=()=>openViewer(item);
-  const pic=document.createElement('img');pic.loading='lazy';pic.alt='';pic.src=item.thumb.replace('sz=w1000','sz=w320');pic.onerror=()=>{pic.onerror=null;pic.style.visibility='hidden';preview.dataset.preview='Toque para visualizar'};preview.append(pic);card.append(preview);
+  const pic=document.createElement('img');pic.loading='lazy';pic.alt='';pic.src=item.thumb.replace('sz=w1000','sz=w320');pic.onerror=()=>{pic.onerror=null;recoverFailedThumb(item,pic)};preview.append(pic);card.append(preview);
   if(item.type.startsWith('video/')){const tag=document.createElement('span');tag.className='video-tag';tag.textContent='▶ Vídeo';card.append(tag)}
   const fav=document.createElement('button');fav.className='fav-button';fav.type='button';fav.setAttribute('aria-label',(likedIds.has(item.id)?'Descurtir':'Curtir')+' momento, '+(item.likes||0)+' curtidas');fav.setAttribute('aria-pressed',String(likedIds.has(item.id)));const heart=document.createElement('span');heart.textContent=likedIds.has(item.id)?'♥':'♡';const count=document.createElement('span');count.className='fav-count';count.textContent=String(item.likes||0);fav.append(heart,count);fav.onclick=()=>likeMoment(item,fav);card.append(fav);
   const actions=document.createElement('div');actions.className='media-actions';const see=document.createElement('button');see.type='button';see.textContent='Visualizar';see.onclick=()=>openViewer(item);const down=document.createElement('button');down.type='button';down.textContent='↓ Baixar';down.onclick=async()=>{await openViewer(item);if(selectedMedia===item&&activeObjectUrl)downloadCurrent()};actions.append(see,down);card.append(actions);root.append(card)
