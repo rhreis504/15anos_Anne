@@ -283,6 +283,7 @@ el('guest-form').onsubmit=e=>{
  }).withFailureHandler(err=>{el('guest-error').textContent=err.message||String(err)}).registerGuest(name,id);
 };
 el('guest-skip').onclick=finishWelcome;
+if(guestProfile&&guestProfile.id){google.script.run.withSuccessHandler(ids=>{likedIds.clear();ids.forEach(id=>likedIds.add(id));renderGallery()}).getGuestVotes(guestProfile.id)}
 el('guest-camera').onclick=()=>{finishWelcome();el('camera').click()};
 let activeObjectUrl=null,selectedMedia=null,mediaLoading=false;
 function mediaRpc(id){return new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getMediaData(id))}
@@ -306,6 +307,7 @@ function renderRanking(){
  })
 }
 function likeMoment(item,button){
+ if(!guestProfile){el('guest-welcome').hidden=false;document.body.style.overflow='hidden';return}
  if(button.disabled)return;button.disabled=true;
  const liked=likedIds.has(item.id),delta=liked?-1:1;
  google.script.run.withSuccessHandler(result=>{
@@ -313,7 +315,7 @@ function likeMoment(item,button){
    if(liked)likedIds.delete(item.id);else likedIds.add(item.id);
    try{localStorage.setItem('anne_public_likes',JSON.stringify([...likedIds]))}catch(e){}
    renderGallery();renderRanking()
- }).withFailureHandler(e=>{button.disabled=false;status('Não foi possível registrar a curtida: '+(e.message||e))}).registrarCurtida(item.id,delta)
+ }).withFailureHandler(e=>{button.disabled=false;status('Não foi possível registrar a curtida: '+(e.message||e))}).registrarCurtida(item.id,delta,guestProfile&&guestProfile.id)
 }
 function renderGallery(){
  const root=el('gallery');root.replaceChildren();
