@@ -2,71 +2,107 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>15 anos da Anne</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1d101d">
+<title>Anne XV | Uma noite para sempre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Great+Vibes&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:dark;font-synthesis:none}
+:root{color-scheme:dark;--night:#160e19;--plum:#2b182b;--rose:#d4a5aa;--gold:#e6c99d;--cream:#fff4e9;--muted:#cbb9bd}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{margin:0;min-width:280px;background:#090909;color:#f7f3ed;font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-wrap:anywhere}
-header{text-align:center;padding:clamp(42px,9vw,100px) max(18px,env(safe-area-inset-right)) 46px max(18px,env(safe-area-inset-left));padding-bottom:clamp(32px,6vw,64px)}
-header>div:first-child{font-size:clamp(10px,2.5vw,13px);line-height:1.8}
-h1,h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;line-height:1.1}
-h1{font-size:clamp(42px,10vw,92px);letter-spacing:-.045em;margin:18px auto;max-width:100%}
-h2{font-size:clamp(28px,6vw,42px);margin:0 0 14px}
-p{color:#c7c0ba;max-width:620px;margin:14px auto;line-height:1.65}
-button,.download{border:1px solid #aaa;border-radius:30px;padding:14px 20px;min-height:48px;background:#fff;color:#111;font:600 15px/1.3 inherit;cursor:pointer;text-decoration:none;touch-action:manipulation}
-button:focus-visible,a:focus-visible{outline:3px solid #d8c5a5;outline-offset:3px}
-button.alt{background:transparent;color:#fff}
-main{max-width:1100px;margin:auto;padding:clamp(22px,5vw,48px) max(16px,env(safe-area-inset-right)) 64px max(16px,env(safe-area-inset-left))}
-main>p{margin:0 0 25px}
-#gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:clamp(8px,2vw,16px);align-items:start}
-.card{min-width:0;background:#222;border-radius:12px;overflow:hidden}
-.card img{display:block;width:100%;aspect-ratio:1;object-fit:cover}
-.card .meta{padding:12px;overflow-wrap:anywhere}
-.card a{color:white;font-size:14px;line-height:1.5}
-#status{padding:14px 8px;text-align:center;max-width:640px;margin:12px auto 0;min-height:20px;overflow-wrap:anywhere}
+body{margin:0;min-width:280px;background:var(--night);color:var(--cream);font:15px/1.65 "DM Sans",system-ui,sans-serif;overflow-x:hidden}
+a{color:inherit}button{font:inherit;cursor:pointer;touch-action:manipulation}
+button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:4px}
+.topbar{height:70px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(20px,5vw,75px);border-bottom:1px solid #ffffff18;background:#1a101c}
+.brand{font-family:"Playfair Display",Georgia,serif;font-size:24px;letter-spacing:.06em}
+.brand span{font-family:"Great Vibes",cursive;font-size:32px;color:var(--gold);padding-left:3px}
+.topbar a{text-decoration:none;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.hero{position:relative;isolation:isolate;min-height:570px;display:grid;place-items:center;text-align:center;padding:95px 22px 100px;background:radial-gradient(ellipse at 50% 35%,#71435966 0%,#36203955 40%,transparent 72%),linear-gradient(145deg,#281526,#160e19 65%)}
+.hero:before,.hero:after{content:"✧";position:absolute;color:var(--gold);opacity:.35;font-size:clamp(90px,19vw,240px);font-family:Georgia,serif;z-index:-1}
+.hero:before{top:20px;left:4%;transform:rotate(-20deg)}.hero:after{right:5%;bottom:12px;transform:rotate(18deg)}
+.hero-inner{max-width:780px;width:100%}
+.overline{text-transform:uppercase;letter-spacing:.38em;font-size:11px;font-weight:700;color:var(--gold)}
+.ornament{display:flex;align-items:center;justify-content:center;gap:15px;color:var(--gold);margin:25px auto 12px}
+.ornament:before,.ornament:after{content:"";display:block;width:65px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+.ornament:after{transform:rotate(180deg)}
+.scriptname{font:normal clamp(90px,18vw,170px)/.95 "Great Vibes",cursive;color:var(--cream);margin:5px 0 0;text-shadow:0 7px 30px #0005}
+.fifteen{font:400 clamp(27px,5vw,43px)/1.3 "Playfair Display",Georgia,serif;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin:-2px 0 23px}
+.intro{font-size:clamp(14px,2vw,17px);color:#e8d9d7;max-width:490px;margin:0 auto 28px}
+.actions{display:flex;justify-content:center;flex-wrap:wrap;gap:12px}
+.actions button{min-height:51px;padding:13px 25px;border-radius:100px;border:1px solid var(--gold);background:var(--gold);color:#291a22;font-weight:700;transition:transform .2s,background .2s}
+.actions button.alt{background:#ffffff0b;color:var(--cream);border-color:#d6bca7}
+.actions button:hover{transform:translateY(-2px)}
+#status{max-width:650px;margin:17px auto 0;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--cream);font-size:13px;min-height:16px}
 input[type=file]{display:none}
-.actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;max-width:650px;margin:26px auto 0}
-.actions button{flex:0 1 auto;white-space:normal}
-.empty{text-align:center;padding:40px 18px;border:1px dashed #555;grid-column:1/-1;border-radius:12px}
-@media(max-width:600px){
- header{padding-top:55px;padding-bottom:32px}
- h1{font-size:clamp(43px,12vw,68px)}
- .actions{flex-direction:column;align-items:stretch;max-width:420px;gap:10px}
- .actions button{width:100%;min-height:52px}
- main{padding-top:25px}
+.scroll-note{display:block;margin-top:43px;color:#ddc5c5;text-decoration:none;text-transform:uppercase;letter-spacing:.23em;font-size:10px}
+.scroll-note span{display:block;font-size:25px;line-height:1.2;margin-top:7px;color:var(--gold)}
+.section{max-width:1210px;margin:0 auto;padding:clamp(56px,8vw,105px) clamp(16px,4vw,42px) 95px}
+.section-top{text-align:center;margin:0 auto 42px}
+.section-top .eyebrow{font-size:11px;letter-spacing:.28em;color:var(--gold);text-transform:uppercase}
+.section-top h2{font:400 clamp(37px,6vw,64px)/1.16 "Playfair Display",Georgia,serif;margin:12px 0;color:var(--cream)}
+.section-top p{color:var(--muted);margin:0 auto;max-width:550px}
+.divider-flower{color:var(--gold);font-size:20px;margin:15px}
+#gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;align-items:start}
+.card{min-width:0;background:#281c29;border:1px solid #e6c99d22;border-radius:12px;overflow:hidden;box-shadow:0 15px 35px #0002;transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-4px);border-color:#e6c99d77}
+.card img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;background:#362839}
+.card .meta{padding:14px 12px 16px}
+.card a{font-size:12px;text-decoration:none;color:var(--gold);font-weight:700;letter-spacing:.025em}
+.card a:hover{text-decoration:underline}
+.empty{grid-column:1/-1;text-align:center;padding:70px 20px;border:1px solid #e6c99d55;border-radius:14px;background:#ffffff06;color:var(--muted)}
+footer{text-align:center;border-top:1px solid #e6c99d26;padding:36px 18px 48px;color:#d3bcb9;font-size:12px;letter-spacing:.08em}
+footer strong{display:block;font:normal 42px "Great Vibes",cursive;color:var(--gold);letter-spacing:0;margin-bottom:6px}
+@media(max-width:900px){#gallery{grid-template-columns:repeat(3,minmax(0,1fr))}.hero{min-height:530px}}
+@media(max-width:620px){
+ .topbar{height:60px;padding:0 19px}.brand{font-size:20px}.brand span{font-size:27px}.topbar a{font-size:10px}
+ .hero{min-height:0;padding:78px 20px 68px}.hero:before,.hero:after{font-size:95px;opacity:.18}
+ .overline{font-size:9px;letter-spacing:.24em}.scriptname{font-size:clamp(86px,22vw,135px)}
+ .fifteen{font-size:27px;letter-spacing:.18em;margin-bottom:21px}
+ .intro{font-size:14px}
+ .actions{flex-direction:column;max-width:390px;margin:auto;gap:10px}.actions button{width:100%;min-height:53px}
+ .scroll-note{margin-top:30px}
+ .section{padding:60px 13px 70px}.section-top{margin-bottom:28px}.section-top h2{font-size:39px}
  #gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
- .card{border-radius:9px}
- .card .meta{padding:9px}
- .card a{font-size:12px}
+ .card{border-radius:9px}.card .meta{padding:11px 8px}.card a{font-size:11px}
 }
-@media(max-width:350px){#gallery{grid-template-columns:1fr}.card a{font-size:14px}}
-@media(hover:hover){button:hover{opacity:.87}.card:hover{transform:translateY(-2px);transition:transform .2s}}
+@media(max-width:350px){#gallery{grid-template-columns:1fr}.card img{aspect-ratio:4/3}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 </style>
 </head>
 <body>
-<header>
-<div style="letter-spacing:.3em">UMA NOITE PARA SEMPRE</div>
-<h1>15 anos da Anne</h1>
-<p>Momentos inesquecíveis, compartilhados por quem viveu cada instante.</p>
-<div class="actions">
-<button onclick="document.getElementById('camera').click()">Tirar foto</button>
-<button class="alt" onclick="document.getElementById('files').click()">Enviar fotos e vídeos</button>
-</div>
-<input id="camera" type="file" accept="image/*" capture="environment">
-<input id="files" type="file" accept="image/*,video/*" multiple>
-<div id="status" role="status">
-</div>
+<nav class="topbar" aria-label="Navegação principal">
+  <div class="brand">Anne <span>XV</span></div>
+  <a href="#momentos">Ver galeria ↓</a>
+</nav>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="overline">Uma noite para sempre</div>
+    <div class="ornament" aria-hidden="true">✦</div>
+    <h1 class="scriptname">Anne</h1>
+    <div class="fifteen">15 anos</div>
+    <p class="intro">Uma noite mágica, mil histórias para contar. Compartilhe seu olhar e faça parte das nossas lembranças.</p>
+    <div class="actions">
+      <button type="button" onclick="document.getElementById('camera').click()">✧ Tirar uma foto</button>
+      <button type="button" class="alt" onclick="document.getElementById('files').click()">♡ Enviar fotos e vídeos</button>
+    </div>
+    <input id="camera" type="file" accept="image/*" capture="environment">
+    <input id="files" type="file" accept="image/*,video/*" multiple>
+    <div id="status" role="status" aria-live="polite"></div>
+    <a class="scroll-note" href="#momentos">Descubra os momentos <span>⌄</span></a>
+  </div>
 </header>
-<main>
-<h2>Nossos momentos</h2>
-<p>Explore as lembranças da festa e baixe suas favoritas.</p>
-<div id="gallery">
-<div class="empty">Carregando momentos…</div>
-</div>
+<main id="momentos" class="section">
+  <div class="section-top">
+    <div class="eyebrow">Memórias que ficam</div>
+    <h2>Nossos momentos</h2>
+    <div class="divider-flower" aria-hidden="true">✧</div>
+    <p>Cada sorriso merece ser lembrado. Veja as fotos, assista aos vídeos e guarde suas lembranças favoritas.</p>
+  </div>
+  <div id="gallery"><div class="empty">Carregando momentos especiais…</div></div>
 </main>
+<footer><strong>Anne</strong>Uma noite para sempre · 15 anos</footer>
 <script>
 const el=id=>document.getElementById(id);function status(s){el('status').textContent=s}
 function refresh(){google.script.run.withSuccessHandler(items=>{const root=el('gallery');root.replaceChildren();if(!items.length){root.innerHTML='<div class="empty">Seja o primeiro a compartilhar um momento!</div>';return}
