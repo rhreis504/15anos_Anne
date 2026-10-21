@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1d101d">
-<title>Anne XV | Rosé e Dourado</title>
+<meta name="theme-color" content="#2b1019">
+<title>Anne XV | Álbum de Memórias</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Great+Vibes&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
@@ -65,6 +65,47 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 }
 @media(max-width:350px){#gallery{grid-template-columns:1fr}.card img{aspect-ratio:4/3}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+
+/* Modelo 1 — composição editorial inspirada na referência escolhida */
+:root{--cover:url("https://raw.githubusercontent.com/rhreis504/15anos_Anne/main/assets/anne-debutante.jpg")}
+.topbar{position:relative;z-index:2;background:#2a1019e8;border-bottom-color:#eec7a455}
+.hero{min-height:640px;justify-content:flex-end;text-align:left;padding:64px clamp(24px,6vw,100px);background:linear-gradient(90deg,#260e160a 0%,#310e1e40 35%,#270d1ae8 75%,#210e18f2 100%),var(--cover) left 35% center/cover no-repeat,radial-gradient(circle at 25% 35%,#a75b70,#2b1019 65%)}
+.hero:before{inset:clamp(9px,2vw,20px);border-radius:18px;z-index:0}
+.hero:after{display:none}
+.hero-inner{max-width:570px;margin-left:auto;text-align:center;padding:34px 24px;background:radial-gradient(ellipse,#290d1b9c,transparent 77%)}
+.scriptname{font-size:clamp(105px,14vw,168px);color:#ffe2c4}
+.fifteen{font-size:clamp(24px,3vw,36px)}
+.intro{font-size:16px}
+.actions button{background:linear-gradient(135deg,#b63c5b,#8e2947);color:#fff5ee;border-color:#efc5a0}
+.actions button.alt{background:linear-gradient(135deg,#ffe8d4,#efc89d);color:#481b2b}
+.section{position:relative}
+.section:before{content:"✧";position:absolute;right:5%;top:25px;color:#efc99d88;font-size:45px}
+#gallery{gap:13px}
+.card{position:relative;border-color:#e7bd91;border-radius:11px}
+.card img{aspect-ratio:1;object-fit:cover}
+.card .meta{padding:10px 12px}
+.gallery-tools{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:0 auto 28px}
+.gallery-tools button{min-height:42px;padding:9px 20px;border:1px solid #eac39b77;background:#ffffff08;color:#f8e7dd;border-radius:30px;font-size:13px}
+.gallery-tools button.active{background:#efc99d;color:#351623;border-color:#efc99d}
+.fav-button{position:absolute;top:9px;right:9px;display:grid;place-items:center;width:34px;height:34px;border:1px solid #fff9;border-radius:50%;background:#301522a6;color:#fff;font-size:21px;line-height:1}
+.fav-button[aria-pressed="true"]{color:#ffb1c6;background:#5c1b32e8}
+.video-tag{position:absolute;top:10px;left:10px;padding:4px 9px;border-radius:20px;background:#2c1321cc;color:white;font-size:11px}
+@media(max-width:900px){.hero{min-height:590px;background-position:center,left 38% center,center}.hero-inner{max-width:480px}}
+@media(max-width:620px){
+.topbar{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+.hero{min-height:650px;padding:35px max(18px,env(safe-area-inset-right)) 48px max(18px,env(safe-area-inset-left));justify-content:flex-end;align-items:flex-end;text-align:center;background:linear-gradient(180deg,#280d1608 0%,#260d1655 31%,#240c19dc 65%,#240c19f5 100%),var(--cover) center 20%/cover no-repeat,linear-gradient(145deg,#9c5267,#29121e)}
+.hero:before{inset:10px;border-radius:12px;z-index:0;pointer-events:none}
+.hero-inner{max-width:100%;margin:0 auto;padding:18px 9px 22px;background:linear-gradient(180deg,transparent,#220d18b0);position:relative;z-index:1}
+.scriptname{font-size:clamp(85px,22vw,125px);margin:0}
+.fifteen{font-size:25px;margin:0 0 12px}
+.ornament{margin:9px auto 0}.intro{font-size:13px;line-height:1.5;margin-bottom:17px}
+.actions{gap:9px}.actions button{min-height:50px}
+.scroll-note{margin-top:15px}
+.section{padding-top:44px}.section:before{display:none}
+.gallery-tools{gap:6px;margin-bottom:19px}.gallery-tools button{padding:8px 13px;font-size:12px;min-height:40px}
+.card img{aspect-ratio:1}.fav-button{top:6px;right:6px;width:29px;height:29px}
+}
+@media(max-width:360px){.hero{min-height:625px}.hero-inner{padding:12px 5px}.scriptname{font-size:82px}.overline{letter-spacing:.15em}.gallery-tools button{padding:7px 10px}}
 </style>
 </head>
 <body>
@@ -96,13 +137,27 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
     <div class="divider-flower" aria-hidden="true">✧</div>
     <p>Cada sorriso merece ser lembrado. Veja as fotos, assista aos vídeos e guarde suas lembranças favoritas.</p>
   </div>
-  <div id="gallery"><div class="empty">Carregando momentos especiais…</div></div>
+  <div class="gallery-tools" role="group" aria-label="Filtrar momentos"><button type="button" data-filter="all" class="active">Todos</button><button type="button" data-filter="image">Fotos</button><button type="button" data-filter="video">Vídeos</button><button type="button" data-filter="favorite">♡ Favoritos</button></div>\n  <div id="gallery"><div class="empty">Carregando momentos especiais…</div></div>
 </main>
 <footer><strong>Anne</strong>Uma noite para sempre · 15 anos</footer>
 <script>
-const el=id=>document.getElementById(id);function status(s){el('status').textContent=s}
-function refresh(){google.script.run.withSuccessHandler(items=>{const root=el('gallery');root.replaceChildren();if(!items.length){root.innerHTML='<div class="empty">Seja o primeiro a compartilhar um momento!</div>';return}
-for(const item of items){const card=document.createElement('article');card.className='card';const link=document.createElement('a');link.href=item.view;link.target='_blank';link.rel='noopener';const pic=document.createElement('img');pic.loading='lazy';pic.alt='Momento da festa';pic.src=item.thumb;link.append(pic);const meta=document.createElement('div');meta.className='meta';const a=document.createElement('a');a.href=item.download;a.target='_blank';a.rel='noopener';a.textContent=item.type.startsWith('video/')?'Assistir / baixar vídeo':'Visualizar / baixar foto';meta.append(a);card.append(link,meta);root.append(card)}}).withFailureHandler(e=>status('Não foi possível carregar a galeria: '+e.message)).listMedia()}
+const el=id=>document.getElementById(id);let galleryItems=[],activeFilter='all';const favorites=new Set();function status(s){el('status').textContent=s}
+function renderGallery(){
+ const root=el('gallery');root.replaceChildren();
+ const items=galleryItems.filter(item=>activeFilter==='all'||(activeFilter==='favorite'?favorites.has(item.id||item.view):item.type.startsWith(activeFilter+'/')));
+ if(!items.length){const empty=document.createElement('div');empty.className='empty';empty.textContent=activeFilter==='favorite'?'Toque no coração de uma foto para guardá-la nesta sessão.':'Seja o primeiro a compartilhar um momento!';root.append(empty);return}
+ for(const item of items){
+  const card=document.createElement('article');card.className='card';
+  const link=document.createElement('a');link.href=item.view;link.target='_blank';link.rel='noopener';
+  const pic=document.createElement('img');pic.loading='lazy';pic.alt='Momento da festa';pic.src=item.thumb;link.append(pic);
+  card.append(link);
+  if(item.type.startsWith('video/')){const tag=document.createElement('span');tag.className='video-tag';tag.textContent='▶ Vídeo';card.append(tag)}
+  const fav=document.createElement('button');fav.className='fav-button';fav.type='button';fav.setAttribute('aria-label','Marcar como favorito');const key=item.id||item.view;fav.setAttribute('aria-pressed',String(favorites.has(key)));fav.textContent=favorites.has(key)?'♥':'♡';fav.onclick=()=>{if(favorites.has(key))favorites.delete(key);else favorites.add(key);renderGallery()};card.append(fav);
+  const meta=document.createElement('div');meta.className='meta';const a=document.createElement('a');a.href=item.download;a.target='_blank';a.rel='noopener';a.textContent=item.type.startsWith('video/')?'Assistir / baixar vídeo':'Visualizar / baixar foto';meta.append(a);card.append(meta);root.append(card)
+ }
+}
+function refresh(){google.script.run.withSuccessHandler(items=>{galleryItems=items||[];renderGallery()}).withFailureHandler(e=>status('Não foi possível carregar a galeria: '+e.message)).listMedia()}
+document.querySelectorAll('[data-filter]').forEach(btn=>btn.addEventListener('click',()=>{activeFilter=btn.dataset.filter;document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('active',b===btn));renderGallery()}));
 async function send(files){const selected=[...files];if(!selected.length)return;for(let i=0;i<selected.length;i++){const f=selected[i];if(f.size>15*1024*1024){status('Arquivo '+f.name+' ultrapassa 15 MB. Envie um arquivo menor.');continue}
 status('Enviando '+(i+1)+' de '+selected.length+': '+f.name);try{const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=reject;reader.readAsDataURL(f)});await new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).uploadMedia({name:f.name,mime:f.type,base64:data}));status('Enviado '+(i+1)+' de '+selected.length);refresh()}
 catch(e){status('Falha ao enviar '+f.name+': '+e.message);return}}status('Envio concluído!')}el('camera').onchange=e=>send(e.target.files);el('files').onchange=e=>send(e.target.files);refresh();setInterval(refresh,30000)
