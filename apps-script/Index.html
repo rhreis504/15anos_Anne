@@ -314,6 +314,7 @@ function schedulePreview(item,img){
  img.style.visibility='hidden';
  img.parentElement.dataset.preview=item.type.startsWith('video/')?'▶ Toque para assistir':'Aguardando foto…';
  if(item.type.startsWith('video/'))return;
+ if(previewCache.has(item.id)){img.src=previewCache.get(item.id);img.style.visibility='visible';img.parentElement.removeAttribute('data-preview');return}
  previewQueue.push({item,img});
  drainPreviews();
 }
