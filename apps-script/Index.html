@@ -246,7 +246,7 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
       <button type="button" onclick="document.getElementById('camera').click()">✧ Tirar uma foto</button>
       <button type="button" class="alt" onclick="document.getElementById('files').click()">♡ Enviar fotos e vídeos</button>
     </div>
-    <input id="camera" type="file" accept="image/*" capture="environment">
+    <input id="camera" type="file" accept="image/*" capture="user"><input id="guest-video-input" type="file" accept="video/*" capture="user">
     <input id="files" type="file" accept="image/*,video/*" multiple>
     <div id="status" role="status" aria-live="polite"></div><div id="upload-progress" class="upload-progress" role="progressbar" aria-label="Progresso do envio" aria-valuemin="0" aria-valuemax="100"><div id="progress-label">Preparando arquivos…</div><div id="progress-track" class="progress-track"><div id="progress-fill" class="progress-fill"></div></div><small id="progress-detail"></small></div>
     <a class="scroll-note" href="#momentos">Descubra os momentos <span>⌄</span></a>
@@ -280,11 +280,14 @@ el('guest-form').onsubmit=e=>{
   guestProfile={name:result.name,id:id};
   try{localStorage.setItem('anne_guest_v1',JSON.stringify(guestProfile))}catch(e){}
   el('guest-form').hidden=true;el('guest-selfie').hidden=false;
+  el('guest-invitation-title').textContent=result.name+', você faz parte dessa história!';
  }).withFailureHandler(err=>{el('guest-error').textContent=err.message||String(err)}).registerGuest(name,id);
 };
 el('guest-skip').onclick=finishWelcome;
 if(guestProfile&&guestProfile.id){google.script.run.withSuccessHandler(ids=>{likedIds.clear();ids.forEach(id=>likedIds.add(id));renderGallery()}).withFailureHandler(e=>status('Não foi possível sincronizar curtidas: '+(e.message||e))).getGuestVotes(guestProfile.id)}
 el('guest-camera').onclick=()=>{finishWelcome();el('camera').click()};
+el('guest-video').onclick=()=>{finishWelcome();el('guest-video-input').click()};
+el('guest-video-input').onchange=e=>send(e.target.files);
 let activeObjectUrl=null,selectedMedia=null,mediaLoading=false;
 function mediaRpc(id){return new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getMediaData(id))}
 function mediaBlob(data){const binary=atob(data.base64);const bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return new Blob([bytes],{type:data.mime})}
@@ -346,7 +349,7 @@ progress(completed/selected.length*100,'Arquivo '+(i+1)+' de '+selected.length+'
 await new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).uploadMedia({name:f.name,mime:f.type,base64:data}));
 completed++;progress(completed/selected.length*100,completed+' de '+selected.length+' arquivos enviados','Upload confirmado');refresh()
 }catch(e){status('Falha ao enviar '+f.name+': '+(e.message||e));progress(completed/selected.length*100,'Envio interrompido','Verifique o arquivo e tente novamente');return}}
-status('Envio concluído!');progress(100,'Envio concluído!',completed+' arquivo(s) enviado(s) com sucesso')}finally{sending=false;el('camera').value='';el('files').value=''}}
+status('Envio concluído!');progress(100,'Envio concluído!',completed+' arquivo(s) enviado(s) com sucesso')}finally{sending=false;el('camera').value='';el('files').value='';el('guest-video-input').value=''}}
 el('camera').onchange=e=>send(e.target.files);el('files').onchange=e=>send(e.target.files);refresh();setInterval(refresh,30000)
 </script>
 </body>
