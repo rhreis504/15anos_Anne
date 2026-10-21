@@ -300,7 +300,7 @@ const previewCache=new Map();
 function loadPreview(item,img){
  img.onerror=null;
  img.style.visibility='hidden';
- if(item.type.startsWith('video/'))return;
+ if(item.type.startsWith('video/')){img.parentElement.setAttribute('data-preview','▶ Toque para assistir');return}
  mediaRpc(item.id).then(data=>{
   const url=URL.createObjectURL(mediaBlob(data));
   previewCache.set(item.id,url);
