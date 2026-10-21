@@ -218,6 +218,15 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 .ranking-card img{aspect-ratio:1}
 @media(max-width:900px){.ranking-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:620px){.ranking-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.ranking-card:first-child{grid-column:auto}.ranking-card:first-child img{aspect-ratio:1}}
+.guest-welcome{position:fixed;inset:0;z-index:11000;display:flex;align-items:center;justify-content:center;padding:18px;background:#180a13f5;overflow:auto}
+.guest-welcome[hidden],#guest-selfie[hidden]{display:none}
+.guest-box{width:min(100%,430px);padding:36px 25px;border:1px solid #edc99a;border-radius:22px;background:radial-gradient(circle at top,#633043,#2b1420 75%);text-align:center;box-shadow:0 22px 65px #0009}
+.guest-box h2{font:400 32px "Playfair Display",serif;color:#ffe0bd}
+.guest-box p{color:#f6d9d5}
+.guest-box input{width:100%;padding:15px;border:1px solid #f0c99d;border-radius:12px;background:#fff9f2;color:#311421;font:inherit;margin:12px 0}
+.guest-box button{display:block;width:100%;margin-top:12px;min-height:49px;border:1px solid #f0c99d;border-radius:30px;background:#efc99d;color:#341521;font-weight:700}
+#guest-skip{background:transparent;color:#ffe6d0}
+#guest-error{color:#ffd5d5;font-size:12px;margin-top:10px}
 </style>
 </head>
 <body><div id="guest-welcome" class="guest-welcome" hidden><div class="guest-box"><h2>Bem-vindo à festa da Anne!</h2><p>Como podemos chamar você?</p><form id="guest-form"><input id="guest-name" placeholder="Seu primeiro nome" maxlength="50" required><button type="submit">Entrar na festa</button></form><div id="guest-selfie" hidden><p>Que tal começar com uma selfie? Ela aparecerá no álbum da festa.</p><button type="button" id="guest-camera">Quero tirar minha selfie</button><button type="button" id="guest-skip">Agora não</button></div><div id="guest-error" role="status"></div></div></div>
