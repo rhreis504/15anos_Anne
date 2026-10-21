@@ -19,10 +19,11 @@ function doGet() {
 function folder_() { return DriveApp.getFolderById(CONFIG.FOLDER_ID); }
 function listMedia() {
   const files=folder_().getFiles(), result=[];
+  const counts=PropertiesService.getScriptProperties().getProperties();
   while(files.hasNext() && result.length < 500) {
     const f=files.next(), mime=f.getMimeType();
     if(!CONFIG.ALLOWED.includes(mime)) continue;
-    result.push({id:f.getId(),name:f.getName(),type:mime,created:f.getDateCreated().getTime(),
+    result.push({id:f.getId(),name:f.getName(),type:mime,created:f.getDateCreated().getTime(),likes:Number(counts['anne_likes_'+f.getId()]||0),
       thumb:'https://drive.google.com/thumbnail?id='+encodeURIComponent(f.getId())+'&sz=w1000',
       view:'https://drive.google.com/file/d/'+encodeURIComponent(f.getId())+'/preview',
       download:'https://drive.google.com/uc?export=download&id='+encodeURIComponent(f.getId())});
