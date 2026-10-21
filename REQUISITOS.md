@@ -23,3 +23,13 @@
 
 ## Estado
 Requisitos definidos; backend, upload, galeria dinâmica e QR Code ainda não implementados.
+
+## Experiência da galeria — decisão complementar
+- Convidados podem escolher várias fotos e vídeos já existentes na galeria do celular e enviar em lote.
+- A página oferece ações separadas para tirar foto, gravar vídeo e escolher arquivos existentes.
+- Layout sofisticado, monocromático, inspirado na referência Flock, sem copiar marca.
+- Mosaico responsivo com fotos e vídeos, visualização ampliada, reprodução e download individual.
+- Filtros de navegação: todos os momentos, fotos e vídeos; ordenação por envio recente.
+- Seção de pessoas pode mostrar momentos dos convidados sem reconhecimento facial ou identificação automática.
+- Galeria lê o conteúdo autorizado da pasta Drive via backend, sem tornar a pasta publicamente editável.
+- Exibir progresso e resultados de envios múltiplos, com recuperação de falhas por arquivo.
