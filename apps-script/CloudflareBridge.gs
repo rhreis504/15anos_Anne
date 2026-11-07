@@ -19,6 +19,24 @@ function anneBridgeOutput_(obj) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
+/**
+ * Execute UMA VEZ pelo botão "Executar" no editor Apps Script.
+ * A chave fica armazenada nas Propriedades do script (não no HTML).
+ * Copie a chave em Configurações do projeto > Propriedades do script
+ * para a variável secreta ANNE_BRIDGE_KEY na Cloudflare Pages.
+ */
+function anneGerarTokenPonte() {
+  var props = PropertiesService.getScriptProperties();
+  var old = props.getProperty('ANNE_BRIDGE_KEY');
+  if (old && old.length >= 32) {
+    Logger.log('A chave da ponte já existe. Veja em Configurações do projeto > Propriedades do script.');
+    return;
+  }
+  var key = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
+  props.setProperty('ANNE_BRIDGE_KEY',key);
+  Logger.log('Chave criada. Veja em Configurações do projeto > Propriedades do script.');
+}
+
 function doPost(e) {
   try {
     var expected = PropertiesService.getScriptProperties().getProperty('ANNE_BRIDGE_KEY');
