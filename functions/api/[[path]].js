@@ -1,12 +1,12 @@
 /**
  * Anne XV / Cloudflare Pages Functions
  * API de mesmo dominio: R2 MEDIA, D1 DB. Nao usa Google Apps Script.
- * Restricoes: 15 MiB por arquivo, 25 midias por convidado e 2000 no evento.
+ * Restricoes: 15 MiB por arquivo, 25 midias por convidado e 500 no evento.
  * PUBLICAR APENAS DEPOIS de configurar bindings, schema e moderacao.
  */
 const MAX_BYTES = 15 * 1024 * 1024;
 const MAX_PER_GUEST = 25;
-const MAX_TOTAL = 2000;
+const MAX_TOTAL = 500;
 const GUEST_RE = /^guest_[0-9a-f]{40}$/;
 const MEDIA_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const ALLOWED = new Set(['image/jpeg','image/png','image/webp','image/heic','image/heif','video/mp4','video/quicktime','video/webm']);
