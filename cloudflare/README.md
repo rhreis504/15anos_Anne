@@ -42,7 +42,7 @@ Apenas publicar a página estática não ativa a galeria: crie e vincule R2 + D1
 
 ## Segurança e limites
 
-Esta é uma galeria pública de festa. O acesso aos arquivos é público para quem tem o link. **Os envios não têm moderação automática**. Para o evento, configure Cloudflare Turnstile/WAF, limites de tráfego e monitore os custos antes de divulgar o QR Code. A API limita 25 arquivos por convidado e 2000 arquivos por evento, mas esses limites não substituem proteção contra abuso por identidades novas. Não armazene fotos sensíveis. Consulte as cotas atuais do plano gratuito.
+Esta é uma galeria pública de festa. O acesso aos arquivos é público para quem tem o link. **Os envios não têm moderação automática**. Para o evento, configure Cloudflare Turnstile/WAF, limites de tráfego e monitore os custos antes de divulgar o QR Code. A API limita 25 arquivos por convidado e 500 arquivos por evento, mas esses limites não substituem proteção contra abuso por identidades novas. Não armazene fotos sensíveis. Consulte as cotas atuais do plano gratuito.
 
 A página inicial evita redirecionamentos ao Google Apps Script, mas a compatibilidade deve ser validada no Safari, Chrome, Firefox e navegadores de mensagens.
 
