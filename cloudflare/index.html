@@ -372,10 +372,18 @@ el('guest-form').onsubmit=e=>{
   try{localStorage.setItem('anne_guest_v1',JSON.stringify(guestProfile))}catch(e){}
   el('guest-form').hidden=true;el('guest-selfie').hidden=false;
   el('guest-invitation-title').textContent=result.name+', você faz parte dessa história!';
- }).withFailureHandler(err=>{el('guest-error').textContent=err.message||String(err)}).registerGuest(name,id);
+ }).withFailureHandler(err=>{
+   guestProfile={name,id,pending:true};
+   try{localStorage.setItem('anne_guest_v1',JSON.stringify(guestProfile))}catch(_e){}
+   el('guest-form').hidden=true;
+   el('guest-selfie').hidden=false;
+   el('guest-invitation-title').textContent=name+', você faz parte dessa história!';
+   el('guest-error').textContent='A página está acessível. Fotos e curtidas ficarão disponíveis quando a integração com o Google Drive for concluída.';
+   status('A galeria está temporariamente indisponível.');
+  }).registerGuest(name,id);
 };
 el('guest-skip').onclick=finishWelcome;
-if(guestProfile&&guestProfile.id){anneCall('registerGuest',guestProfile.name,guestProfile.id).then(()=>anneCall('getGuestVotes',guestProfile.id)).then(ids=>{likedIds.clear();ids.forEach(id=>likedIds.add(id));renderGallery()}).catch(e=>status('Não foi possível sincronizar curtidas: '+(e.message||e)))}
+if(guestProfile&&guestProfile.id){anneCall('registerGuest',guestProfile.name,guestProfile.id).then(()=>{guestProfile.pending=false;try{localStorage.setItem('anne_guest_v1',JSON.stringify(guestProfile))}catch(_e){};return anneCall('getGuestVotes',guestProfile.id)}).then(ids=>{likedIds.clear();ids.forEach(id=>likedIds.add(id));renderGallery()}).catch(e=>status('Não foi possível sincronizar curtidas: '+(e.message||e)))}
 el('guest-camera').onclick=()=>{finishWelcome();el('camera').click()};
 el('guest-video').onclick=()=>{finishWelcome();el('guest-video-input').click()};
 el('guest-video-input').onchange=e=>send(e.target.files);
@@ -383,25 +391,49 @@ let activeObjectUrl=null,selectedMedia=null,mediaLoading=false;
 const mediaRequests=new Map();
 function mediaRpc(id){
  if(mediaRequests.has(id))return mediaRequests.get(id);
- const p=fetch('/api/media/'+encodeURIComponent(id)).then(async r=>{
-  if(!r.ok)throw Error('Nao foi possivel abrir este arquivo.');
-  return {mime:r.headers.get('Content-Type')||'application/octet-stream',blob:await r.blob()};
- });
- mediaRequests.set(id,p);p.catch(()=>mediaRequests.delete(id));return p;
+ const p=anneJson('/api/media-data',{id});
+ mediaRequests.set(id,p);
+ p.catch(()=>mediaRequests.delete(id));
+ return p;
 }
-function mediaBlob(data){return data.blob}
+function mediaBlob(data){
+ const binary=atob(data.base64);
+ const bytes=new Uint8Array(binary.length);
+ for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+ return new Blob([bytes],{type:data.mime});
+}
 function closeViewer(){el('viewer').classList.remove('open');el('viewer-body').replaceChildren();if(activeObjectUrl){if(!selectedMedia||previewCache.get(selectedMedia.id)!==activeObjectUrl)URL.revokeObjectURL(activeObjectUrl);activeObjectUrl=null}selectedMedia=null;el('viewer-download').disabled=true;document.body.style.overflow=''}
 async function openViewer(item){closeViewer();selectedMedia=item;el('viewer-title').textContent=item.name||'Momento da Anne';el('viewer').classList.add('open');document.body.style.overflow='hidden';el('viewer-body').textContent='Carregando momento…';el('viewer-download').disabled=true;if(!item.type.startsWith('video/')){const quick=document.createElement('img');quick.src=previewCache.get(item.id)||item.thumb;quick.alt='Foto da festa';quick.style.cssText='max-width:100%;max-height:70vh;object-fit:contain';el('viewer-body').replaceChildren(quick)}if(item.type.startsWith('video/')){showVideo(item);return}try{const cached=previewCache.get(item.id);const data=cached?{mime:item.type}:await mediaRpc(item.id);if(selectedMedia!==item)return;activeObjectUrl=cached||URL.createObjectURL(mediaBlob(data));el('viewer-body').replaceChildren();const media=document.createElement(data.mime.startsWith('video/')?'video':'img');media.src=activeObjectUrl;if(media.tagName==='VIDEO'){media.controls=true;media.playsInline=true;media.preload='metadata'}else media.alt='Fotografia da festa';el('viewer-body').append(media);el('viewer-download').disabled=false}catch(e){if(selectedMedia===item)el('viewer-body').textContent='Não foi possível abrir o arquivo: '+(e.message||e)}}
-function showVideo(item){
- const video=document.createElement('video');video.src=item.view;video.controls=true;video.playsInline=true;video.preload='metadata';
- video.style.cssText='display:block;width:100%;max-height:70dvh;object-fit:contain';
- el('viewer-body').replaceChildren(video);el('viewer-download').disabled=false;
+async function showVideo(item){
+ try{
+  const data=await mediaRpc(item.id);
+  if(selectedMedia!==item)return;
+  const url=URL.createObjectURL(mediaBlob(data));
+  activeObjectUrl=url;
+  const video=document.createElement('video');
+  video.src=url;video.controls=true;video.playsInline=true;video.preload='metadata';
+  video.style.cssText='display:block;width:100%;max-height:70dvh;object-fit:contain';
+  el('viewer-body').replaceChildren(video);
+  el('viewer-download').disabled=false;
+ }catch(e){
+  if(selectedMedia===item){
+   const link=document.createElement('a');
+   link.href=item.view;link.target='_blank';link.rel='noopener noreferrer';
+   link.textContent='Assistir ao vídeo pelo Google Drive';
+   el('viewer-body').replaceChildren(link);
+  }
+ }
 }
-function downloadCurrent(){
- if(!selectedMedia)return;
- const a=document.createElement('a');a.href=selectedMedia.download;a.download=selectedMedia.name||'momento-anne';
- a.rel='noopener';document.body.append(a);a.click();a.remove();
+async function downloadMedia(item){
+ try{
+  const data=await mediaRpc(item.id);
+  const url=URL.createObjectURL(mediaBlob(data));
+  const a=document.createElement('a');a.href=url;a.download=item.name||'momento-anne';
+  document.body.append(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+ }catch(e){status('Não foi possível baixar o arquivo: '+(e.message||e))}
 }
+function downloadCurrent(){if(selectedMedia)downloadMedia(selectedMedia)}
 el('viewer-close').onclick=closeViewer;el('viewer-download').onclick=downloadCurrent;el('viewer').onclick=e=>{if(e.target===el('viewer'))closeViewer()};document.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewer()});
 const previewQueue=[];
 let previewBusy=0;
@@ -471,7 +503,7 @@ function renderGallery(){
   const pic=document.createElement('img');pic.loading='lazy';pic.alt='';pic.src=item.thumb;pic.onerror=()=>schedulePreview(item,pic);preview.append(pic);card.append(preview);
   if(item.type.startsWith('video/')){const tag=document.createElement('span');tag.className='video-tag';tag.textContent='▶ Vídeo';card.append(tag)}
   const fav=document.createElement('button');fav.className='fav-button';fav.type='button';fav.setAttribute('aria-label',(likedIds.has(item.id)?'Descurtir':'Curtir')+' momento, '+(item.likes||0)+' curtidas');fav.setAttribute('aria-pressed',String(likedIds.has(item.id)));const heart=document.createElement('span');heart.textContent=likedIds.has(item.id)?'♥':'♡';const count=document.createElement('span');count.className='fav-count';count.textContent=String(item.likes||0);fav.append(heart,count);fav.onclick=()=>likeMoment(item,fav);card.append(fav);
-  const actions=document.createElement('div');actions.className='media-actions';const see=document.createElement('button');see.type='button';see.textContent='Visualizar';see.onclick=()=>openViewer(item);const down=document.createElement('button');down.type='button';down.textContent='↓ Baixar';down.onclick=()=>{const link=document.createElement('a');link.href=item.download;link.download=item.name||'momento-anne';link.rel='noopener';document.body.append(link);link.click();link.remove()};actions.append(see,down);card.append(actions);root.append(card)
+  const actions=document.createElement('div');actions.className='media-actions';const see=document.createElement('button');see.type='button';see.textContent='Visualizar';see.onclick=()=>openViewer(item);const down=document.createElement('button');down.type='button';down.textContent='↓ Baixar';down.onclick=()=>downloadMedia(item);actions.append(see,down);card.append(actions);root.append(card)
  }
 }
 let galleryFirstLoad=true;
@@ -484,29 +516,40 @@ document.querySelectorAll('[data-filter]').forEach(btn=>btn.addEventListener('cl
 let sending=false;
 function progress(percent,label,detail,waiting=false){const box=el('upload-progress');box.classList.add('visible');el('progress-label').textContent=label;el('progress-detail').textContent=detail;el('progress-fill').style.width=percent+'%';el('progress-track').classList.toggle('waiting',waiting);box.setAttribute('aria-valuenow',waiting?'':String(Math.round(percent)));box.setAttribute('aria-valuetext',waiting?'Aguardando confirmação do servidor':Math.round(percent)+'%')}
 async function send(files){
- const selected=[...files];if(!selected.length||sending)return;
- if(!guestProfile||!guestProfile.id){el('guest-welcome').hidden=false;document.body.style.overflow='hidden';status('Informe seu nome antes do envio.');return}
+ const selected=[...files];
+ if(!selected.length||sending)return;
+ if(!guestProfile||!guestProfile.id||guestProfile.pending){
+  status('A galeria ainda não está disponível para envios. Tente novamente mais tarde.');
+  return;
+ }
  sending=true;let completed=0;
  try{
   for(let i=0;i<selected.length;i++){
    const f=selected[i];
    if(f.size>15*1024*1024){status('Arquivo '+f.name+' ultrapassa 15 MB. Envie um arquivo menor.');continue}
-   progress(completed/selected.length*100,'Arquivo '+(i+1)+' de '+selected.length+': '+f.name,'Enviando para a galeria...',true);
+   progress(completed/selected.length*100,'Arquivo '+(i+1)+' de '+selected.length+': '+f.name,'Lendo arquivo...',false);
    try{
-    const response=await fetch('/api/upload',{method:'POST',headers:{
-     'Content-Type':f.type||'application/octet-stream',
-     'X-Guest-Id':guestProfile.id,
-     'X-File-Name':encodeURIComponent(f.name)
-    },body:f});
-    const result=await response.json().catch(()=>({}));
-    if(!response.ok)throw Error(result.error||'Erro HTTP '+response.status);
+    const base64=await new Promise((resolve,reject)=>{
+     const reader=new FileReader();
+     reader.onerror=()=>reject(Error('Erro ao ler arquivo'));
+     reader.onload=()=>resolve(String(reader.result).split(',')[1]);
+     reader.readAsDataURL(f);
+    });
+    progress(completed/selected.length*100,'Arquivo '+(i+1)+' de '+selected.length+': '+f.name,'Enviando ao Google Drive...',true);
+    await anneJson('/api/upload',{name:f.name,mime:f.type,base64});
     completed++;progress(completed/selected.length*100,completed+' de '+selected.length+' arquivos enviados','Envio confirmado');
     refresh();
-   }catch(error){status('Falha ao enviar '+f.name+': '+(error.message||error));progress(completed/selected.length*100,'Envio interrompido','Tente novamente');return}
+   }catch(e){
+    status('Falha ao enviar '+f.name+': '+(e.message||e));
+    progress(completed/selected.length*100,'Envio interrompido','Tente novamente');
+    return;
+   }
   }
-  if(completed)status('Envio concluido!');
-  progress(100,'Envio concluido!',completed+' arquivo(s) enviado(s) com sucesso');
- }finally{sending=false;el('camera').value='';el('files').value='';el('guest-video-input').value=''}
+  if(completed)status('Envio concluído!');
+  progress(100,'Envio concluído!',completed+' arquivo(s) enviado(s) ao Google Drive');
+ }finally{
+  sending=false;el('camera').value='';el('files').value='';el('guest-video-input').value='';
+ }
 }
 el('camera').onchange=e=>send(e.target.files);el('files').onchange=e=>send(e.target.files);refresh();setInterval(refresh,30000)
 </script>
