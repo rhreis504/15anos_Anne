@@ -67,3 +67,7 @@ Se a ponte não estiver ativa, o cadastro não impede mais a navegação pelo si
 - A função Pages conta para a franquia gratuita de requests do Cloudflare Workers; o site não grava mídias no Cloudflare.
 - A API do Google é protegida por chave em propriedade do Script e segredo do Pages, mas a aplicação de convidados é pública; recomenda-se configurar WAF/rate limit para evitar uploads indevidos.
 - **Teste os uploads reais antes de imprimir os QR Codes**. O ContentService do Google Apps Script redireciona respostas e o proxy precisa acompanhar esses redirecionamentos; a compatibilidade depende do teste de ponta a ponta.
+
+## Publicação de configuração
+
+Reimplantação das variáveis em produção — 07/11/2026. Esse registro aciona novo deploy automático no Cloudflare Pages após configurar as duas variáveis de produção. Não altera os arquivos do site, nem a implantação V0010 do Apps Script.
