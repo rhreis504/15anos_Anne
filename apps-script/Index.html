@@ -67,7 +67,7 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 
 /* Modelo 1 — composição editorial inspirada na referência escolhida */
-:root{--cover:url("https://raw.githubusercontent.com/rhreis504/15anos_Anne/main/anne-desktop.png")}
+:root{--cover:url("https://raw.githubusercontent.com/rhreis504/15anos_Anne/main/anne-desktop2.png")}
 .topbar{position:relative;z-index:2;background:#2a1019e8;border-bottom-color:#eec7a455}
 .hero{min-height:640px;justify-content:flex-end;text-align:left;padding:64px clamp(24px,6vw,100px);background:linear-gradient(90deg,#260e160a 0%,#310e1e40 35%,#270d1ae8 75%,#210e18f2 100%),var(--cover) left 35% center/cover no-repeat,radial-gradient(circle at 25% 35%,#a75b70,#2b1019 65%)}
 .hero:before{inset:clamp(9px,2vw,20px);border-radius:18px;z-index:0}
@@ -228,6 +228,83 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 #guest-skip{background:transparent;color:#ffe6d0}.guest-box h3{color:#ffe6d0;font:400 25px Georgia,serif}.welcome-ornament{color:#efc99d;font-size:24px;letter-spacing:8px}.welcome-note{font-size:11px;color:#e9c3cd}#guest-video{background:#f2d4ad}#guest-camera{background:#8b4860;color:#fff4eb}
 #guest-error{color:#ffd5d5;font-size:12px;margin-top:10px}
 .ranking-card button[data-preview]:after,.media-open[data-preview]:after{content:attr(data-preview);position:absolute;top:50%;left:0;width:100%;transform:translateY(-50%);text-align:center;color:#f3d5bd;font-size:13px;pointer-events:none}
+
+/* CAPA ANNE 2026-11-07: a arte já contém Anne / 15 anos / Momentos.
+   Preservar foto e comandos funcionais; eliminar duplicação e escurecimento. */
+.visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.hero{
+  display:flex;
+  position:relative;
+  isolation:isolate;
+  align-items:flex-end;
+  justify-content:flex-start;
+  min-height:clamp(560px,47vw,850px);
+  padding:0 0 clamp(52px,7vw,108px);
+  text-align:left;
+  background:var(--cover) center center / cover no-repeat #29121e;
+}
+.hero:before{inset:clamp(9px,1.3vw,20px);z-index:2;pointer-events:none}
+.hero:after{display:none}
+.hero-photo{display:none}
+.hero-inner{
+  position:relative;
+  z-index:3;
+  flex:0 0 auto;
+  width:min(45vw,680px);
+  max-width:none;
+  margin:0 0 0 clamp(18px,5.5vw,105px);
+  padding:0;
+  background:transparent;
+  text-align:center;
+}
+.hero-inner .actions{
+  display:flex;
+  flex-direction:row;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  max-width:none;
+  margin:0;
+}
+.hero-inner .actions button{
+  width:auto;
+  min-height:50px;
+  padding:12px 22px;
+  font-size:14px;
+  box-shadow:0 5px 20px #1f0a1870;
+}
+.hero-inner #status{margin:12px auto 0}
+@media(min-width:621px) and (max-width:900px){
+  .hero{min-height:clamp(480px,60vw,630px);background:var(--cover) center / cover no-repeat #29121e;padding-bottom:clamp(22px,5vw,45px)}
+  .hero-inner{width:49vw;margin-left:clamp(10px,3vw,40px)}
+  .hero-inner .actions{gap:8px}
+  .hero-inner .actions button{font-size:12px;min-height:44px;padding:9px 11px}
+}
+@media(max-width:620px){
+  /* Mobile: apresentar a arte horizontal completa, sem cortar o título,
+     e manter os dois botões acessíveis logo abaixo da imagem. */
+  :root{--cover:url("https://raw.githubusercontent.com/rhreis504/15anos_Anne/main/anne-desktop2.png")}
+  .hero{display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;min-height:0;padding:0 0 24px;background:#29121e;text-align:center}
+  .hero-photo{
+    display:block!important;
+    position:relative;
+    inset:auto;
+    z-index:0;
+    width:100%;
+    height:auto;
+    min-height:0;
+    aspect-ratio:1672/941;
+    background:var(--cover) center center / contain no-repeat #29121e;
+  }
+  .hero-photo:after{display:none}
+  .hero:before{inset:8px;border-radius:12px;z-index:2}
+  .hero-inner{position:relative;z-index:3;flex:0 0 auto;width:100%;max-width:460px;margin:0 auto;padding:15px 18px 12px;background:transparent;text-align:center}
+  .hero-inner .actions{flex-direction:column;max-width:350px;margin:0 auto;gap:10px}
+  .hero-inner .actions button{width:100%;min-height:52px;font-size:14px;padding:12px 16px}
+  .hero-inner #status{max-width:350px;margin:12px auto 0}
+}
+
 </style>
 </head>
 <body><div id="guest-welcome" class="guest-welcome" hidden><div class="guest-box"><h2>Bem-vindo à festa da Anne!</h2><p>Como podemos chamar você?</p><form id="guest-form"><input id="guest-name" placeholder="Seu primeiro nome" maxlength="50" required><button type="submit">Entrar na festa</button></form><div id="guest-selfie" hidden><div class="welcome-ornament">✦ ♡ ✦</div><h3 id="guest-invitation-title">Você faz parte dessa história!</h3><p>Que alegria ter você aqui! Antes de aproveitar a festa, que tal deixar uma lembrança especial para a Anne?</p><p>Deixe um recadinho em vídeo para ela guardar suas palavras com carinho, ou tire uma selfie para ela lembrar do seu sorriso nessa noite tão especial.</p><p class="welcome-note">As imagens enviadas aparecerão na galeria e poderão ser vistas e baixadas pelos convidados.</p><button type="button" id="guest-video">♡ Deixar um recadinho em vídeo</button><button type="button" id="guest-camera">✧ Tirar uma selfie para a Anne</button><button type="button" id="guest-skip">Agora não, quero entrar</button></div><div id="guest-error" role="status"></div></div></div>
@@ -238,11 +315,7 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
 <header class="hero">
   <div class="hero-photo" aria-hidden="true"></div>
   <div class="hero-inner">
-    <div class="overline">Uma noite para sempre</div>
-    <div class="ornament" aria-hidden="true">✦</div>
-    <h1 class="scriptname">Anne</h1>
-    <div class="fifteen">15 anos</div>
-    <p class="intro">Uma noite de sonhos, sorrisos e lembranças inesquecíveis. Registre cada momento desta celebração especial.</p>
+    <h1 class="visually-hidden">Anne, 15 anos — Momentos</h1>
     <div class="actions">
       <button type="button" onclick="document.getElementById('camera').click()">✧ Tirar uma foto</button>
       <button type="button" class="alt" onclick="document.getElementById('files').click()">♡ Enviar fotos e vídeos</button>
@@ -250,7 +323,6 @@ footer strong{display:block;font:normal 44px "Great Vibes",cursive;color:var(--g
     <input id="camera" type="file" accept="image/*" capture="user"><input id="guest-video-input" type="file" accept="video/*" capture="user">
     <input id="files" type="file" accept="image/*,video/*" multiple>
     <div id="status" role="status" aria-live="polite"></div><div id="upload-progress" class="upload-progress" role="progressbar" aria-label="Progresso do envio" aria-valuemin="0" aria-valuemax="100"><div id="progress-label">Preparando arquivos…</div><div id="progress-track" class="progress-track"><div id="progress-fill" class="progress-fill"></div></div><small id="progress-detail"></small></div>
-    <a class="scroll-note" href="#momentos">Descubra os momentos <span>⌄</span></a>
   </div>
 </header>
 <section id="ranking" class="ranking-section" aria-labelledby="ranking-title"><div class="section-top"><div class="eyebrow">Os preferidos da festa</div><h2 id="ranking-title">Momentos mais amados</h2><div class="divider-flower">✧</div><p>O Top 10 das fotos e dos vídeos mais curtidos pelos convidados.</p></div><div id="ranking-grid" class="ranking-grid"><div class="ranking-empty">As primeiras curtidas vão aparecer aqui.</div></div></section><main id="momentos" class="section">
