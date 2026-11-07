@@ -1,55 +1,69 @@
-# Anne XV — versão Cloudflare Pages (independente)
+# 15 anos da Anne — Cloudflare Pages + Google Drive
 
-Esta versão está na ramificação **cloudflare-pages**, separada da ramificação **main**. O Google Apps Script V0010 e os arquivos do Google Drive não foram alterados. Não exclua a versão original.
+Esta é a versão de trabalho da ramificação `cloudflare-pages`. A original `main` e a implantação do Google Apps Script **V0010** ficam preservadas.
 
-## Configure o Pages (tela atual da Cloudflare)
+## O que fica onde
 
-- Repositório: `rhreis504/15anos_Anne`.
-- **Production branch: `cloudflare-pages`** (NUNCA `main` para este teste).
-- Project name: `15anos-anne` (se disponível).
-- Framework preset: `None`.
-- Build command: `exit 0` (sem gerar dist).
-- Build output directory: `cloudflare`.
-- Root directory (advanced): deixar **vazio** (raiz do repositório).
-- Arquivo inicial: `cloudflare/index.html`.
-- Funções de backend: `functions/api/[[path]].js`.
-- Capa: `cloudflare/anne-desktop2.png` (arquivo local, sem depender do GitHub na execução).
+- **Cloudflare Pages**: HTML/CSS/JS, imagem `anne-desktop2.png` e função que encaminha chamadas.
+- **Google Apps Script original**: faz cadastro, upload, lista fotos e registra curtidas.
+- **Google Drive original**: continua armazenando TODAS as fotos e vídeos.
+- **ScriptProperties original**: preserva o histórico de convidados e curtidas. Não há migração.
+- **Cloudflare R2, D1**: **não são usados** neste modelo. Não ativar assinatura R2.
+- A API /api do Pages é uma ponte e não salva fotos/vídeos na Cloudflare.
 
-Apenas publicar a página estática não ativa a galeria: crie e vincule R2 + D1 antes de liberar os envios.
+## 1. Adicionar a ponte ao Apps Script existente sem alterar a V0010
 
-## Criar banco e armazenamento (dados novos, sem tocar no original)
+1. Acesse https://script.google.com/home, abra **Anne XV - Homologação v2.1**.
+2. Clique em **+** na seção Arquivos > **Script**.
+3. Nome: `CloudflareBridge`.
+4. Cole o conteúdo inteiro de:
+   https://github.com/rhreis504/15anos_Anne/blob/cloudflare-pages/apps-script/CloudflareBridge.gs
+5. Salve. Não substitua `Código.gs`, `Index.html`, `Likes.gs`, `Guests.gs`.
+6. No menu de funções selecione `anneGerarTokenPonte` > **Executar**. Autorize se necessário.
+7. Engrenagem **Configurações do projeto** > **Propriedades do script**: copie o valor `ANNE_BRIDGE_KEY` para uso secreto na Cloudflare. **Nunca coloque esse valor no GitHub ou no HTML.**
 
-1. No Cloudflare > Storage & databases > **R2**, crie o bucket `anne-xv-media` no armazenamento **Standard**.
-2. No Cloudflare > Storage & databases > **D1**, crie o banco `anne-xv-db`.
-3. No banco D1, abra **Console**, cole todo o conteúdo de `cloudflare/schema.sql` e execute.
-4. Em Workers & Pages > seu projeto Pages > **Settings > Bindings**:
-   - **R2 bucket**, variável **MEDIA** → bucket `anne-xv-media`.
-   - **D1 database**, variável **DB** → banco `anne-xv-db`.
-5. Configure os mesmos bindings nos ambientes de **Production** e **Preview**, se for usar ambos. Publique uma nova implantação para aplicar as alterações.
-6. Teste `https://SEU-SITE.pages.dev/api/health`. Deve responder `"ok":true`, `"r2":true`, `"d1":true`.
-7. **Somente após validar os custos, permissões e a moderação de envios**, configure a variável `UPLOADS_ENABLED` como **`true`** e publique novamente. Por padrão, o upload fica desativado para evitar arquivos abusivos.
+**Proteção:** uma implantação versionada existente utiliza a versão estática antiga, por isso V0010 permanece funcionando mesmo depois de acrescentar um arquivo e salvar o rascunho. Não editar, arquivar, excluir ou atualizar V0010.
 
-## Como funciona
+## 2. Criar NOVA implantação do backend
 
-- `GET /api/health` — verifica bindings e schema D1.
-- `GET /api/media` — lista até 200 fotos/vídeos novos.
-- `GET /api/media/{id}` — lê mídia do R2, com Range para vídeo.
-- `GET /api/media/{id}?download=1` — baixa o arquivo.
-- `POST /api/guest` — registra o primeiro nome do convidado.
-- `GET /api/guest/{id}/likes` — recupera as curtidas do convidado.
-- `POST /api/like` — registra ou retira curtida; D1 evita duplicadas.
-- `POST /api/upload` — recebe imagem/vídeo até 15 MiB via navegador, apenas com convidado cadastrado e uploads habilitados.
+1. Apps Script > **Implantar** > **Nova implantação**, não "Gerenciar implantações".
+2. Tipo **App da Web**.
+3. Descrição: `Backend Cloudflare - Anne`.
+4. Executar como: **Eu**.
+5. Quem pode acessar: **Qualquer pessoa**.
+6. Clique **Implantar** e autorize as permissões se pedidas.
+7. Copie a URL `https://script.google.com/macros/s/.../exec` dessa **nova implantação**. Ela é uma URL separada da V0010.
 
-## Segurança e limites
+O código da nova implantação contém a função `doPost` da ponte, mas mantém `doGet` do projeto original.
 
-Esta é uma galeria pública de festa. O acesso aos arquivos é público para quem tem o link. **Os envios não têm moderação automática**. Para o evento, configure Cloudflare Turnstile/WAF, limites de tráfego e monitore os custos antes de divulgar o QR Code. A API limita 25 arquivos por convidado e 500 arquivos por evento, mas esses limites não substituem proteção contra abuso por identidades novas. Não armazene fotos sensíveis. Consulte as cotas atuais do plano gratuito.
+## 3. Configurar as duas variáveis Cloudflare Pages
 
-A página inicial evita redirecionamentos ao Google Apps Script, mas a compatibilidade deve ser validada no Safari, Chrome, Firefox e navegadores de mensagens.
+1. Dashboard Cloudflare > **Workers & Pages** > projeto `15anos-anne`.
+2. **Settings > Variables and Secrets**, ambiente **Production**, clique **Add**:
+   - `ANNE_APPS_SCRIPT_URL`: URL da **nova** implantação `/exec`.
+   - `ANNE_BRIDGE_KEY`: chave gerada no Apps Script, clique em **Encrypt** para guardar como segredo.
+3. **Save**, depois crie **nova implantação do Pages** (Redeploy / Retry deployment ou faça novo commit nesta ramificação).
+4. Abra `https://15anos-anne.pages.dev/api/health`. Deve mostrar JSON com `"ok":true` e `"storage":"google-drive"`.
 
-## Galeria existente no Google Drive
+**NÃO** configure `MEDIA`, `DB`, `UPLOADS_ENABLED`, `anne-xv-media` nem R2. O banco D1 `anne-xv-db` criado anteriormente pode ficar sem uso; não será consultado pelo site.
 
-A galeria **nova** começa vazia. As fotos e curtidas existentes permanecem no Google Drive/Apps Script original e **não são migradas automaticamente**. Será necessária uma etapa de migração posterior para o R2 e D1, preservando os identificadores ou mapeando-os. Não retire o antigo link/QR Code até concluir a migração e validar tudo.
+## 4. Testes antes de compartilhar os QR Codes
 
-## Reversão
+- Safari normal e Chrome: site abre diretamente sem solicitar permissões do Google.
+- Entrada: nome do convidado registrado.
+- Galeria: carrega itens **da mesma pasta original do Drive**.
+- Upload: envia uma foto pequena (JPG/PNG), confere que apareceu na pasta original e na galeria.
+- Curtidas: curtir/descurtir e conferir contagem.
+- Vídeos: testar visualização no iPhone.
+- Download: abrir e baixar uma foto.
+- Confira em janela privativa para testar um convidado que nunca entrou.
 
-O site anterior continua em `script.google.com/.../exec`. Como a nova versão usa outro endereço, basta continuar compartilhando o link anterior. A ramificação `main` não foi alterada.
+Se a ponte não estiver ativa, o cadastro não impede mais a navegação pelo site, mas a galeria mostrará indisponibilidade até configurar a integração. **Não considerar isso como operação completa.**
+
+## 5. Limites e riscos
+
+- O Apps Script original limita arquivos a **15 MB** e publica cada mídia com permissão `Qualquer pessoa com link pode visualizar`.
+- Arquivos maiores não passam; Google Apps Script tem cotas diárias e pode limitar o evento.
+- A função Pages conta para a franquia gratuita de requests do Cloudflare Workers; o site não grava mídias no Cloudflare.
+- A API do Google é protegida por chave em propriedade do Script e segredo do Pages, mas a aplicação de convidados é pública; recomenda-se configurar WAF/rate limit para evitar uploads indevidos.
+- **Teste os uploads reais antes de imprimir os QR Codes**. O ContentService do Google Apps Script redireciona respostas e o proxy precisa acompanhar esses redirecionamentos; a compatibilidade depende do teste de ponta a ponta.
